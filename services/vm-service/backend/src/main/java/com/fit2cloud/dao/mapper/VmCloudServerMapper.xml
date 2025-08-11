@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fit2cloud.dao.mapper.VmCloudServerMapper">
+
+    <resultMap id="serverResultMap" type="com.fit2cloud.dto.VmCloudServerDTO">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="instance_uuid" jdbcType="VARCHAR" property="instanceUuid"/>
+        <result column="instance_name" jdbcType="VARCHAR" property="instanceName"/>
+        <result column="workspace_id" jdbcType="VARCHAR" property="workspaceId"/>
+        <result column="workspace_name" jdbcType="VARCHAR" property="workspaceName"/>
+        <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+        <result column="applyUserName" jdbcType="VARCHAR" property="applyUserName"/>
+    </resultMap>
+
+    <select id="pageVmCloudServer" resultMap="serverResultMap">
+        SELECT
+            vm_cloud_server.`id`,
+            vm_cloud_server.`instance_uuid`,
+            vm_cloud_server.`source_id`,
+            vm_cloud_server.`project_id`,
+            vm_cloud_server.`account_id`,
+            vm_cloud_server.`instance_id`,
+            vm_cloud_server.`instance_name`,
+            vm_cloud_server.`image_id`,
+            vm_cloud_server.`auto_renew`,
+            CASE
+                WHEN recycle_bin.STATUS = 'ToBeRecycled' and vm_cloud_server.instance_status !='Deleted' THEN
+                    'ToBeRecycled' ELSE vm_cloud_server.instance_status
+                END AS instance_status,
+            vm_cloud_server.`instance_type`,
+            vm_cloud_server.`instance_type_description`,
+            vm_cloud_server.`region`,
+            vm_cloud_server.`zone`,
+            vm_cloud_server.`host_id`,
+            vm_cloud_server.`host`,
+            vm_cloud_server.`resource_pool_id`,
+            vm_cloud_server.`resource_pool`,
+            vm_cloud_server.`remote_ip`,
+            vm_cloud_server.`ip_array`,
+            vm_cloud_server.`os`,
+            vm_cloud_server.`os_version`,
+            vm_cloud_server.`cpu`,
+            vm_cloud_server.`memory`,
+            vm_cloud_server.`disk`,
+            vm_cloud_server.`hostname`,
+            vm_cloud_server.`management_ip`,
+            vm_cloud_server.`management_port`,
+            vm_cloud_server.`os_info`,
+            vm_cloud_server.`remark`,
+            vm_cloud_server.`network`,
+            vm_cloud_server.`vpc_id`,
+            vm_cloud_server.`subnet_id`,
+            vm_cloud_server.`network_interface_id`,
+            vm_cloud_server.`management_ipv6`,
+            vm_cloud_server.`remote_ipv6`,
+            vm_cloud_server.`local_ipv6`,
+            vm_cloud_server.`ip_type`,
+            vm_cloud_server.`snap_shot`,
+            vm_cloud_server.`create_time`,
+            vm_cloud_server.`update_time`,
+            vm_cloud_server.`expired_time`,
+            vm_cloud_server.`last_operate_time`,
+            IF(vm_cloud_server.instance_status='Deleted',vm_cloud_server.`last_operate_time`,NULL) as delete_time,
+            vm_cloud_server.`vm_tools_version`,
+            vm_cloud_server.`vm_tools_status`,
+            vm_cloud_server.`instance_charge_type`,
+            vm_cloud_server.`security_group_ids`,
+            vm_cloud_server.apply_user,
+            user._name as applyUserName,
+            cloud_account.NAME AS account_name,
+            cloud_account.platform AS platform,
+            IF(orgWorkspace.type = "workspace",orgWorkspace.id,NULL) as workspace_id,
+            IF(orgWorkspace.type = "workspace",orgWorkspace.NAME,NULL) as workspace_name,
+            orgWorkspace.organization_id,
+            orgWorkspace.organization_name
+        FROM
+            vm_cloud_server
+                LEFT JOIN cloud_account ON vm_cloud_server.account_id = cloud_account.id
+                LEFT JOIN org_workspace orgWorkspace ON vm_cloud_server.source_id = orgWorkspace.id
+                LEFT JOIN user ON vm_cloud_server.apply_user = user.username
+                LEFT JOIN recycle_bin ON vm_cloud_server.id = recycle_bin.resource_id
+                AND recycle_bin.resource_type = 'VM'
+                AND recycle_bin.STATUS = 'ToBeRecycled'
+            ${ew.customSqlSegment}
+    </select>
+
+    <select id="getById" resultType="com.fit2cloud.dto.VmCloudServerDTO">
+        SELECT
+            vm_cloud_server.*,
+            cloud_account.NAME AS account_name,
+            cloud_account.platform AS platform,
+            IF(org_workspace.type = "workspace",org_workspace.id,NULL) as workspace_id,
+            IF(org_workspace.type = "workspace",org_workspace.NAME,NULL) as workspace_name,
+            org_workspace.organization_id,
+            org_workspace.organization_name,
+            user._name as apply_user
+        FROM
+            vm_cloud_server
+                LEFT JOIN cloud_account ON vm_cloud_server.account_id = cloud_account.id
+                LEFT JOIN org_workspace ON vm_cloud_server.source_id = org_workspace.id
+                LEFT JOIN user ON vm_cloud_server.apply_user = user.id
+            ${ew.customSqlSegment}
+    </select>
+
+    <select id="selectServerList" resultMap="serverResultMap">
+        SELECT
+            vm_cloud_server.*,
+            IF(org_workspace.type = "workspace",org_workspace.id,NULL) as workspace_id,
+            IF(org_workspace.type = "workspace",org_workspace.NAME,NULL) as workspace_name
+        FROM
+            vm_cloud_server
+            LEFT JOIN org_workspace ON vm_cloud_server.source_id = org_workspace.id
+            LEFT JOIN recycle_bin ON vm_cloud_server.id = recycle_bin.resource_id
+                AND recycle_bin.resource_type = 'VM'
+                AND recycle_bin.STATUS = 'ToBeRecycled'
+        <where>
+            (recycle_bin.STATUS is null or recycle_bin.STATUS !='ToBeRecycled')
+            <if test="ew != null">
+                <if test="ew.nonEmptyOfWhere">
+                    AND
+                </if>
+                ${ew.sqlSegment}
+            </if>
+        </where>
+    </select>
+</mapper>

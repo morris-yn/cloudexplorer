@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: security-compliance
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  #       国际化配置
+  messages:
+    basename: i18n.messages,i18n.commons
+    encoding: UTF-8
+  quartz:
+    jdbc:
+      initialize-schema: always
+      schema: classpath:/quartz/tables.sql
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: ${spring.application.name}
+            instanceId: ${spring.application.name}
+  flyway:
+    enabled: true
+    table: db_security_compliance_version
+
+server:
+  port: @service.port@
+  servlet:
+    context-path: /${spring.application.name}
+
+#监控，访问路径 {ip}:{port}/actuator
+management:
+  server:
+    port: @service.management.port@
+
+logging:
+  file:
+    path: @ce.log.base.dir@/${spring.application.name}
+  config: classpath:logback-spring.xml
+
+eureka:
+  instance:
+    metadata-map:
+      order: 5
+      name_zh-cn: 安全合规
+      name_zh-tw: 安全合规
+      name_en: Security Compliance
+      basePath: ${server.servlet.context-path}/
+      icon: icon_shield_outlined

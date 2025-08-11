@@ -1,0 +1,5 @@
+name: operation-analysis
+version: APP_VERSION
+port: APP_PORT
+display_name: 运营分析
+icon: icon_operation-analysis_outlined

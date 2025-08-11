@@ -1,0 +1,297 @@
+<template>
+  <el-card shadow="never" class="info-card">
+    <el-row>
+      <el-col :span="10">
+        <div class="title">组织架构分布</div>
+      </el-col>
+      <el-col :span="14" style="text-align: right">
+        <el-radio-group
+          class="custom-radio-group"
+          v-model="paramDepartmentType"
+          @change="getSpreadByDepartmentData()"
+        >
+          <el-radio-button label="org" v-show="!userRole">组织</el-radio-button>
+          <el-radio-button label="workspace">工作空间</el-radio-button>
+        </el-radio-group>
+      </el-col>
+    </el-row>
+    <el-row :gutter="10">
+      <el-col :span="24">
+        <div class="echarts">
+          <div class="echarts-content">
+            <div class="back-btn" @click="handleBackClick" v-if="showBack">
+              返回
+            </div>
+            <v-chart
+              @click="onClick"
+              class="chart"
+              :option="options"
+              v-loading="loading"
+              autoresize
+            />
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+  </el-card>
+</template>
+<script setup lang="ts">
+import VChart from "vue-echarts";
+import { ref, watch } from "vue";
+import _ from "lodash";
+import type { ResourceAnalysisRequest } from "@/api/disk_analysis/type";
+import type { ECBasicOption } from "echarts/types/src/util/types";
+import ResourceSpreadViewApi from "@/api/disk_analysis/index";
+import { useUserStore } from "@commons/stores/modules/user";
+const userStore = useUserStore();
+const userRole = ref<boolean>(userStore.currentRole === "USER");
+const props = defineProps<{
+  cloudAccountId?: string | undefined;
+  currentUnit?: string | undefined;
+}>();
+const params = ref<ResourceAnalysisRequest>();
+const paramDepartmentType = ref<string>(userRole.value ? "workspace" : "org");
+const loading = ref<boolean>(false);
+const apiData = ref<any>();
+const showBack = ref<boolean>(false);
+const parentItem = ref<any>({});
+const options = ref<ECBasicOption>();
+const optionsTree = ref<any>();
+const getSpreadByDepartmentData = () => {
+  showBack.value = false;
+  props.cloudAccountId
+    ? _.set(
+        params,
+        "accountIds",
+        props.cloudAccountId === "all" ? [] : [props.cloudAccountId]
+      )
+    : "";
+  _.set(params, "statisticalBlock", props.currentUnit === "block");
+  _.set(params, "analysisWorkspace", paramDepartmentType.value === "workspace");
+  ResourceSpreadViewApi.getAnalysisOrgWorkspaceDiskCount(params, loading).then(
+    (res) => {
+      apiData.value = res.data;
+      optionsTree.value = undefined;
+      options.value = getOptions();
+    }
+  );
+};
+const getOptions = () => {
+  const obj = apiData.value;
+  const options = _.cloneDeep(defaultSpeedOptions);
+  if (obj) {
+    if (!optionsTree.value) {
+      optionsTree.value = _.cloneDeep(apiData.value.tree);
+    }
+    const tree = optionsTree.value
+      ? optionsTree.value.filter((o: any) => o.value > 0)
+      : [];
+    if (tree.length === 0) {
+      return {
+        title: {
+          text: "暂无数据",
+          x: "center",
+          y: "center",
+          textStyle: {
+            fontSize: 12,
+            fontWeight: "normal",
+          },
+        },
+      };
+    }
+    _.set(
+      options,
+      "xAxis.data",
+      tree.map((item: any) => item.name)
+    );
+    _.set(options, "series[0].itemStyle", barSeriesItemStyle);
+    _.set(options, "series[0].label", barSeriesLabel);
+    const seriesData = ref<any>([]);
+    _.forEach(tree, (v) => {
+      seriesData.value.push({
+        value: v.value,
+        groupName: v.groupName,
+        id: v.id,
+        children: v.children,
+      });
+    });
+    _.set(options, "series[0].data", seriesData.value);
+    // _.set(options, "series[0].name", "磁盘");
+    // _.set(options, "legend.data", ["磁盘"]);
+    const deptNumber = tree.map((item: any) => item.name);
+    let showEcharts = false;
+    let nameNum = 0;
+    if (deptNumber.length > 0) {
+      nameNum = Math.floor(100 / (deptNumber.length / 4));
+      showEcharts = deptNumber.length >= 5;
+    }
+    _.set(options, "dataZoom.[0].end", nameNum);
+    _.set(options, "dataZoom.[1].end", nameNum);
+    _.set(options, "dataZoom.[0].show", showEcharts);
+  }
+  return options;
+};
+
+watch(
+  props,
+  () => {
+    getSpreadByDepartmentData();
+  },
+  { immediate: true }
+);
+
+const handleBackClick = () => {
+  showBack.value = false;
+  parentItem.value = undefined;
+  optionsTree.value = undefined;
+  options.value = getOptions();
+};
+
+const onClick = (params: any) => {
+  if (!params.data.children) return;
+  const children = params.data.children;
+  if (children && children.length > 0) {
+    showBack.value = true;
+    parentItem.value = params.data;
+    optionsTree.value = children;
+    options.value = getOptions();
+  }
+};
+
+const defaultSpeedOptions = {
+  dataZoom: [
+    {
+      type: "slider",
+      realtime: true,
+      start: 0,
+      end: 100, // 数据窗口范围的结束百分比。范围是：0 ~ 100。
+      height: 5, //组件高度
+      left: 5, //左边的距离
+      right: 5, //右边的距离
+      bottom: 10, //下边的距离
+      show: false, // 是否展示
+      fillerColor: "rgba(17, 100, 210, 0.42)", // 滚动条颜色
+      borderColor: "rgba(17, 100, 210, 0.12)",
+      handleSize: 0, //两边手柄尺寸
+      showDetail: false, //拖拽时是否展示滚动条两侧的文字
+      zoomLock: true, //是否只平移不缩放
+      moveOnMouseMove: false, //鼠标移动能触发数据窗口平移
+      brushSelect: false,
+    },
+    {
+      type: "inside", // 支持内部鼠标滚动平移
+      disabled: true, // 停止组件内功能
+      start: 0,
+      end: 100,
+      zoomOnMouseWheel: false, // 关闭滚轮缩放
+      moveOnMouseWheel: false, // 开启滚轮平移
+      moveOnMouseMove: false, // 鼠标移动能触发数据窗口平移
+    },
+  ],
+  color: ["#4E83FD"],
+  legend: {
+    show: true,
+    type: "scroll",
+    icon: "circle",
+    y: "bottom",
+    padding: [0, 0, 10, 0],
+  },
+  grid: {
+    left: "0%",
+    right: "0%",
+    top: "17px",
+    bottom: "15%",
+    containLabel: true,
+  },
+  tooltip: {
+    show: true,
+  },
+  axisLabel: {
+    formatter: function (value: any) {
+      let valueTxt;
+      if (value.length > 5) {
+        valueTxt = value.substring(0, 5) + "...";
+      } else {
+        valueTxt = value;
+      }
+      return valueTxt;
+    },
+  },
+  xAxis: {
+    type: "category",
+    data: [],
+    axisLabel: {
+      // showMaxLabel: false,
+      // showMinLabel: false,
+    },
+  },
+  yAxis: {
+    type: "value",
+  },
+  series: [
+    {
+      barWidth: 16,
+      data: [],
+      type: "bar",
+    },
+  ],
+};
+const colors = ["#4E83FD"];
+const barSeriesItemStyle = {
+  color: function (params: any) {
+    if (params.data && params.data?.groupName === "org") {
+      return colors[0];
+    } else if (params.data && params.data?.groupName === "available") {
+      return colors[0];
+    }
+    return colors[0];
+  },
+  // 这里设置柱形图圆角 [左上角，右上角，右下角，左下角]
+  borderRadius: [2, 2, 0, 0],
+};
+const barSeriesLabel = {
+  show: true, //开启显示
+  position: "top", //在上方显示
+  textStyle: {
+    //数值样式
+    color: "black",
+    fontSize: 12,
+  },
+};
+</script>
+<style scoped lang="scss">
+.info-card {
+  height: 295px;
+  min-width: 400px;
+}
+.chart {
+  min-height: 214px;
+  width: 100%;
+}
+.title {
+  font-weight: bold;
+  font-size: 16px;
+  padding-top: 4px;
+  padding-bottom: 16px;
+}
+.echarts-content {
+  margin-top: 7px;
+}
+.echarts-footer {
+  margin-top: 15px;
+  margin-bottom: 10px;
+  position: initial;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 12px;
+  text-align: center;
+  color: #1f2329;
+}
+.back-btn {
+  margin-left: 5%;
+  //position: absolute;
+  z-index: 10;
+  cursor: pointer;
+}
+</style>

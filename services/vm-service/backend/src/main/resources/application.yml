@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: vm-service
+  mvc:
+    pathmatch:
+       matching-strategy: ANT_PATH_MATCHER
+  #       国际化配置
+  messages:
+    basename: i18n.messages,i18n.commons
+    encoding: UTF-8
+  quartz:
+    jdbc:
+      initialize-schema: always
+      schema: classpath:/quartz/tables.sql
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: ${spring.application.name}
+            instanceId: ${spring.application.name}
+  flyway:
+    enabled: true
+    table: db_vm_service_version
+
+server:
+  port: 9011
+  servlet:
+    context-path: /${spring.application.name}
+
+#监控，访问路径 {ip}:{port}/actuator
+management:
+  server:
+    port: 9911
+  health:
+      elasticsearch:
+        enabled: false
+
+logging:
+  file:
+    path: /opt/cloudexplorer/conf//${spring.application.name}
+  config: classpath:logback-spring.xml
+
+eureka:
+  instance:
+    metadata-map:
+      order: 2
+      name_zh-cn: 云主机管理
+      name_zh-tw: 云主机管理
+      name_en: Virtual Machine Service
+      basePath: ${server.servlet.context-path}/
+      icon: icon_ecs_outlined

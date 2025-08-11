@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: management-center
+#  webflux:
+#    base-path: /${spring.application.name}
+  mvc:
+    pathmatch:
+       matching-strategy: ANT_PATH_MATCHER
+  #       国际化配置
+  messages:
+    basename: i18n.messages,i18n.commons
+    encoding: UTF-8
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: ${spring.application.name}
+            instanceId: ${spring.application.name}
+  flyway:
+    enabled: true
+    table: db_ce_version
+
+server:
+  port: 9010
+  servlet:
+    context-path: /${spring.application.name}
+#监控，访问路径 {ip}:{port}/actuator
+management:
+  server:
+    port: 9910
+  health:
+    elasticsearch:
+      enabled: false
+
+logging:
+  file:
+    path: /opt/cloudexplorer/conf/${spring.application.name}
+  config: classpath:logback-spring.xml
+eureka:
+  instance:
+    metadata-map:
+      order: 1
+      name_zh-cn: 管理中心
+      name_zh-tw: 管理中心
+      name_en: Management Center
+      basePath: ${server.servlet.context-path}/
+      prefer-ip-address: true
+      ip-address: 127.0.0.1
+      icon: icon-group

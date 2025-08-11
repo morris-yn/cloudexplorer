@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: finance-management
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  #       国际化配置
+  messages:
+    basename: i18n.messages,i18n.commons
+    encoding: UTF-8
+  quartz:
+    jdbc:
+      initialize-schema: always
+      schema: classpath:/quartz/tables.sql
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: ${spring.application.name}
+            instanceId: ${spring.application.name}
+  flyway:
+    enabled: true
+    table: db_finance_management_version
+
+server:
+  port: @service.port@
+  servlet:
+    context-path: /${spring.application.name}
+
+#监控，访问路径 {ip}:{port}/actuator
+management:
+  server:
+    port: @service.management.port@
+
+logging:
+  file:
+    path: @ce.log.base.dir@/${spring.application.name}
+  config: classpath:logback-spring.xml
+
+eureka:
+  instance:
+    metadata-map:
+      order: 3
+      name_zh-cn: 云账单
+      name_zh-tw: 云账单
+      name_en: Finance Management
+      basePath: ${server.servlet.context-path}/
+      icon: icon_bill_outlined
+billing:
+  path: /opt/cloudexplorer/data/billing

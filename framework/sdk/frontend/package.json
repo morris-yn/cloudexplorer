@@ -1,0 +1,22 @@
+{
+  "name": "ce-base",
+  "main": "./lib/ce-base.umd.js",
+  "module": "./lib/ce-base.es.js",
+  "types": "./lib/framework/sdk/frontend/commons/index.d.ts",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "dev": "vite --mode development",
+    "build": "run-p type-check build-only",
+    "preview": "vite preview --port 4173",
+    "test:unit": "vitest --environment jsdom",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --noEmit",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "@micro-zoe/micro-app": "^v1.0.0-beta.4"
+  }
+}
