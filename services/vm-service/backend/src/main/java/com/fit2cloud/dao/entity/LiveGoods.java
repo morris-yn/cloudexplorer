@@ -29,7 +29,7 @@ public class LiveGoods {
 //  private long promoteEndDate;
 //  private long warnNumber;
 //  private String keywords;
-//  private String goodsBrief;
+  private String goodsBrief;
 //  private String goodsDesc;
 //  private String goodsThumb;
 //  private String goodsImg;

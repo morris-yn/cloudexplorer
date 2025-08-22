@@ -503,7 +503,7 @@ public class AliyunSyncCloudApi {
             List<DescribeImagesResponseBody.DescribeImagesResponseBodyImagesImage> images = null;
             String os = req.getOs();
             if( "self_define".equals(os)){
-                describeImagesRequest.setOSType("windows");
+                describeImagesRequest.setOSType(null);
                 describeImagesRequest.setImageOwnerAlias("self");
                 images = PageUtil.page(describeImagesRequest, request -> describeImages(client, request), res -> res.getBody().images.image, (request, res) -> res.getBody().getPageSize() <= res.getBody().images.image.size(), request -> request.setPageNumber(request.getPageNumber() + 1));
             }else{

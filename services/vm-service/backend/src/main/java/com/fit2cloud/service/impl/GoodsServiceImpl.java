@@ -2,12 +2,11 @@ package com.fit2cloud.service.impl;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fit2cloud.dao.entity.CDcard;
-import com.fit2cloud.dao.entity.ConfrimPayment;
-import com.fit2cloud.dao.entity.GoodsToCart;
-import com.fit2cloud.dao.entity.LiveGoods;
+import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.dao.entity.contant.LogContants;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
+import com.fit2cloud.dao.mapper.UserValidtimeMapper;
+import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
 import com.fit2cloud.service.IGoodsService;
 import com.fit2cloud.utils.LogUtils;
 import com.fit2cloud.utils.UserContext;
@@ -26,6 +25,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +37,13 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Resource
     LiveGoodsMapper liveGoodsMapper;
+
+    @Resource
+    VmDefaultConfigMapper vmDefaultConfigMapper;
+
+    @Resource
+    UserValidtimeMapper userValidtimeMapper;
+
 
     String sessionId = "";
 
@@ -166,12 +175,31 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Override
     public Boolean confirmPayment(ConfrimPayment confrimPayment) {
-        return liveGoodsMapper.selectPayStatus(confrimPayment.getOrderId());
+        PayStatus payStatus = liveGoodsMapper.selectPayStatus(confrimPayment.getOrderId());
+
+        if(!payStatus.getIsPaid()){
+            return false;
+        }
+
+        String userid = liveGoodsMapper.selectUserId(UserContext.getToken());
+        UserValidtime userValidtime = vmDefaultConfigMapper.selectUserValidtime(userid);
+        if(userValidtime.getVaildTime().isAfter(LocalDateTime.now())){
+            LocalDateTime time = userValidtime.getVaildTime().plusHours(Integer.parseInt(payStatus.getGoodsBrief()));
+            userValidtime.setVaildTime(time);
+            userValidtimeMapper.updateById(userValidtime);
+        }else{
+            LocalDateTime time = LocalDateTime.now().plusHours(Integer.parseInt(payStatus.getGoodsBrief()));
+            userValidtime.setVaildTime(time);
+            userValidtimeMapper.updateById(userValidtime);
+        }
+        return payStatus.getIsPaid();
     }
 
     @Override
-    public Date getVaildTimeByToken(String token) {
-        return Calendar.getInstance().getTime();
+    public LocalDateTime getVaildTimeByToken(String token) {
+        QueryWrapper wrapper = new QueryWrapper<UserValidtime>().eq("user_id",liveGoodsMapper.selectUserId(UserContext.getToken()));
+
+        return  userValidtimeMapper.selectOne(wrapper).getVaildTime();
     }
 
     @Override

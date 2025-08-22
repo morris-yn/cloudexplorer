@@ -1,7 +1,6 @@
 package com.fit2cloud.controller;
 
 import com.fit2cloud.controller.handler.ResultHolder;
-import com.fit2cloud.controller.request.vm.CreateServerRequest;
 import com.fit2cloud.dao.entity.CDcard;
 import com.fit2cloud.dao.entity.ConfrimPayment;
 import com.fit2cloud.dao.entity.GoodsToCart;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.openstack4j.core.transport.HttpRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,13 +31,15 @@ public class GoodsController {
     @Resource
     private IGoodsService goodsService;
 
+    @Resource
+    private IVmDefaultService iVmDefaultService;
+
 //    @Operation(summary = "", description = "分页查询默认配置列表")
 //    @GetMapping("/list")
 ////    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
 //    public ResultHolder<IPage<CreateServerRequest>> list(@Validated PageVmCloudServerRequest pageVmCloudServerRequest) {
 //        return ResultHolder.success();
 //    }
-
 
     @Operation(summary = "", description = "获取商品列表")
     @PostMapping("/list")
@@ -94,6 +94,22 @@ public class GoodsController {
             result.put("vaildTime",goodsService.getVaildTimeByToken(token));
         }
         return ResultHolder.success(result);
+    }
+
+    @Operation(summary = "", description = "心跳接口")
+    @PostMapping("/heart")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Boolean> heart() {
+        return ResultHolder.success(iVmDefaultService.heart());
+    }
+
+
+    @Operation(summary = "", description = "开播")
+    @PostMapping("/startVm")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Boolean> startVm() {
+        Map map = iVmDefaultService.startVm();
+        return ResultHolder.message(map.get("code"),map.get("msg"),null);
     }
 
 }

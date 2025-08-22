@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fit2cloud.controller.handler.ResultHolder;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
 import com.fit2cloud.controller.request.vm.PageVmCloudServerRequest;
+import com.fit2cloud.dao.entity.LiveGoods;
 import com.fit2cloud.dto.VmCloudServerDTO;
 import com.fit2cloud.service.IVmDefaultService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/default")
@@ -46,6 +49,8 @@ public class VmDefaultController {
         iVmDefaultService.save(request);
         return ResultHolder.success(Boolean.TRUE);
     }
+
+
 
 
 }

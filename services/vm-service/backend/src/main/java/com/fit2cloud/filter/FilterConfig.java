@@ -32,7 +32,7 @@ public class FilterConfig {
     public FilterRegistrationBean<loginInfoCheck> loggingFilter() {
         FilterRegistrationBean<loginInfoCheck> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new loginInfoCheck(liveGoodsMapper));
-        registrationBean.addUrlPatterns("/*");
+        registrationBean.addUrlPatterns("/vm-service/goods/*");
         registrationBean.setOrder(1); // 过滤器顺序，值越小越优先
         return registrationBean;
     }

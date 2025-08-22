@@ -5,6 +5,7 @@ import com.fit2cloud.dao.entity.ConfrimPayment;
 import com.fit2cloud.dao.entity.GoodsToCart;
 import com.fit2cloud.dao.entity.LiveGoods;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ public interface IGoodsService {
 
     Boolean confirmPayment(ConfrimPayment confrimPayment);
 
-    Date getVaildTimeByToken(String token);
+    LocalDateTime getVaildTimeByToken(String token);
 
     Map<String,String> writeoff(CDcard card);
 }
