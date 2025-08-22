@@ -1,17 +1,23 @@
 package com.fit2cloud.service.impl;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fit2cloud.dao.entity.CDcard;
 import com.fit2cloud.dao.entity.ConfrimPayment;
 import com.fit2cloud.dao.entity.GoodsToCart;
 import com.fit2cloud.dao.entity.LiveGoods;
+import com.fit2cloud.dao.entity.contant.LogContants;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
 import com.fit2cloud.service.IGoodsService;
+import com.fit2cloud.utils.LogUtils;
+import com.fit2cloud.utils.UserContext;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
@@ -98,7 +104,7 @@ public class GoodsServiceImpl implements IGoodsService {
         //支付
 
         formBody = new FormBody.Builder()
-                .add("shipping", "38")
+                .add("shipping", "39")
                 .add("payment", "9")
                 .add("integral", "0")
                 .add("bonus", "0")
@@ -154,6 +160,7 @@ public class GoodsServiceImpl implements IGoodsService {
         Map<String,String> result = new HashMap<>();
         result.put("QRcode",qrcode);
         result.put("orderId",orderId);
+        LogUtils.setLog(LogContants.ORDER.getCode(),JSONObject.toJSONString(result));
         return result;
     }
 
@@ -169,11 +176,29 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Override
     public Map<String, String> writeoff(CDcard card) {
-        Map result = new HashMap();
-
-
-        result.put("result",Boolean.TRUE);
-        result.put("exchangeTime","30");
+        Map<String,String> result = new HashMap<>();
+        OkHttpClient client = new OkHttpClient();
+        RequestBody req = new FormBody.Builder()
+                .add("card_sn",card.getCard())
+                .add("card_password", card.getKey())
+                .build();
+        Request okRequest = new Request.Builder()
+                .url("http://ecshop-api.livepartner.fans/?service=V2.User.openService")
+                .header("Weibo-Token", UserContext.getToken())
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(req)
+                .build();
+        Response okResponse = null;
+        String resStr = "";
+        try {
+            okResponse = client.newCall(okRequest).execute();
+            resStr = okResponse.body().string();
+            JSONObject resJo = JSONObject.parseObject(resStr);
+            result.put("code",resJo.getString("ret"));
+            result.put("msg",resJo.getString("msg"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return result;
     }

@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CDcard {
-    private String cd;
+    private String card;
     private String key;
 }

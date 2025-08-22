@@ -74,9 +74,9 @@ public class GoodsController {
     @Operation(summary = "", description = "卡密兑换")
     @PostMapping("/CardKeyExchange")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Map> CardKeyExchange(@RequestBody CDcard card) throws Exception {
-
-        return ResultHolder.success(goodsService.writeoff(card));
+    public ResultHolder<Object> CardKeyExchange(@RequestBody CDcard card) throws Exception {
+        Map result = goodsService.writeoff(card);
+        return ResultHolder.message(result.get("code"),result.get("msg"),null);
     }
 
     @Operation(summary = "", description = "查询当前账号有效时间")
