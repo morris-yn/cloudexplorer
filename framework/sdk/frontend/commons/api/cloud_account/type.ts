@@ -136,3 +136,10 @@ export interface UpdateAccount extends CreateAccount {
    */
   id: string;
 }
+
+
+export interface option {
+  id: string;
+  label?: string;
+  value?: string;
+}

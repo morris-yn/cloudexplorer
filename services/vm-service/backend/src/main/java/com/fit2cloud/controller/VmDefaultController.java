@@ -3,14 +3,12 @@ package com.fit2cloud.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fit2cloud.controller.handler.ResultHolder;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
-import com.fit2cloud.controller.request.vm.PageVmCloudServerRequest;
-import com.fit2cloud.dao.entity.LiveGoods;
-import com.fit2cloud.dto.VmCloudServerDTO;
+import com.fit2cloud.dao.entity.DefaultVmConfig;
+import com.fit2cloud.dao.entity.UserValidtime;
 import com.fit2cloud.service.IVmDefaultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,13 +39,28 @@ public class VmDefaultController {
         return ResultHolder.success(Boolean.TRUE);
     }
 
+    @Operation(summary = "", description = "设置默认配置")
+    @PostMapping("/set")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Boolean> set(@RequestBody DefaultVmConfig request) {
+        iVmDefaultService.set(request);
+        return ResultHolder.success(Boolean.TRUE);
+    }
+
+    @Operation(summary = "", description = "获取指定人列表")
+    @GetMapping("/getDesignators")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<List<UserValidtime>> getDesignators() {
+
+        return ResultHolder.success(iVmDefaultService.getDesignators());
+    }
+
 
     @Operation(summary = "", description = "默认配置存储列表")
-    @PostMapping("/list")
+    @GetMapping("/list")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Boolean> list(@RequestBody CreateServerRequest request) {
-        iVmDefaultService.save(request);
-        return ResultHolder.success(Boolean.TRUE);
+    public ResultHolder<IPage<DefaultVmConfig>> list(@ModelAttribute CreateServerRequest request) {
+        return ResultHolder.success(iVmDefaultService.pageDefaultConfig(request));
     }
 
 

@@ -2,6 +2,7 @@ import { exportExcel, get, post, put } from "@commons/request";
 import type Result from "@commons/request/Result";
 import type { Page } from "@commons/request/Result";
 import type {
+  VmDefaultVO,
   VmCloudServerVO,
   ListVmCloudServerRequest,
   CreateServerRequest,
@@ -25,6 +26,30 @@ export function listVmCloudServer(
   loading?: Ref<boolean>
 ): Promise<Result<Page<VmCloudServerVO>>> {
   return get("api/server/page", req, loading);
+}
+
+/**
+ * 默认配置列表
+ * @param req
+ * @param loading
+ */
+export function listVmDefault(
+  req: ListVmCloudServerRequest,
+  loading?: Ref<boolean>
+): Promise<Result<Page<VmDefaultVO>>> {
+  return get("api/default/list", req, loading);
+}
+
+/**
+ * 设置默认配置
+ * @param req
+ * @param loading
+ */
+export function setVmDefault(
+  req: VmDefaultVO,
+  loading?: Ref<boolean>
+): Promise<Result<boolean>> {
+  return post("api/default/set", null, req, loading);
 }
 
 /**
@@ -198,6 +223,18 @@ export function createDefaultServer(
 }
 
 /**
+ * 获取指定人
+ * @param req 
+ * @param loading 
+ * @returns 
+ */
+export function getDesignators(
+  loading?: Ref<boolean>
+): Promise<Result<boolean>> {
+  return get("api/default/getDesignators", null, loading);
+}
+
+/**
  *配置变更
  * @param req
  * @param loading
@@ -306,6 +343,8 @@ const exportData = (req: any, loading: Ref<boolean>) => {
 };
 
 const VmCloudServerApi = {
+  setVmDefault,
+  listVmDefault,
   listVmCloudServer,
   shutdownInstance,
   powerOn,

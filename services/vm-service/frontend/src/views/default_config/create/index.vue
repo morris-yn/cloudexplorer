@@ -12,6 +12,21 @@
     <el-main ref="catalog_container" class="el-main">
       <div>
         <p class="description">{{ steps[active + 1]?.description }}</p>
+        <div>
+          配置名:
+          <el-input v-model="configName"></el-input>
+        </div>
+        <div>
+          指定归属人:
+          <el-select v-model="designator" placeholder="请选择">
+            <el-option
+              v-for="item in designators"
+              :key="item.value"
+              :label="item.userName"
+              :value="item.userId">
+            </el-option>
+        </el-select>
+        </div>
         <base-container
           v-loading="loading"
           style="
@@ -161,8 +176,8 @@ import {
   watch,
 } from "vue";
 import { useRouter } from "vue-router";
-import type { CreateServerRequest } from "@/api/vm_cloud_server/type";
-import {createDefaultServer, createServer } from "@/api/vm_cloud_server";
+import type { CreateServerRequest,option } from "@/api/vm_cloud_server/type";
+import {createDefaultServer, createServer,getDesignators } from "@/api/vm_cloud_server";
 import { useI18n } from "vue-i18n";
 import CeFooterFormItem from "@/views/vm_cloud_server/create/CeFooterFormItem.vue";
 import bus from "@commons/bus";
@@ -183,11 +198,17 @@ const catalog_container = ref<any>(null);
 
 const data = ref<SimpleMap<any>>({});
 
+const configName = ref<string>('');
+
 const formatData = computed(() => {
   return _.assign({}, ..._.values(data.value));
 });
 
 const cloudAccount = ref<CloudAccount | null>(null);
+
+const designators = ref<Array<option>>([]);
+
+const designator = ref<string>('');
 
 function next() {
   if (data.value[0].count != null) {
@@ -226,6 +247,8 @@ function submit() {
     accountId: props.accountId,
     createRequest: JSON.stringify(formatData.value),
     fromInfo: JSON.stringify(formData.value),
+    configName: configName.value,
+    designator: designator.value
   };
   createDefaultServer(req, loading).then((ok) => {
     ElMessage.success(t("commons.msg.op_success"));
@@ -371,6 +394,9 @@ onMounted(() => {
       );
     }
   );
+  getDesignators().then(res =>{
+    designators.value = res.data
+  })
 });
 </script>
 

@@ -7,6 +7,7 @@ import com.fit2cloud.dao.entity.GoodsToCart;
 import com.fit2cloud.dao.entity.LiveGoods;
 import com.fit2cloud.service.IGoodsService;
 import com.fit2cloud.service.IVmDefaultService;
+import com.fit2cloud.utils.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -82,17 +83,9 @@ public class GoodsController {
     @Operation(summary = "", description = "查询当前账号有效时间")
     @PostMapping("/getVaildTime")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Map<String,Object>> getVaildTime(HttpServletRequest request) throws Exception {
-        String token = request.getHeader("token");
+    public ResultHolder<Map<String,Object>> getVaildTime() throws Exception {
         Map<String,Object> result = new HashMap<>();
-        if("abc123456".equals(token)){
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MONTH,6);
-            result.put("vaildTime",calendar.getTime());
-            return ResultHolder.success(result);
-        }else{
-            result.put("vaildTime",goodsService.getVaildTimeByToken(token));
-        }
+        result.put("vaildTime",goodsService.getVaildTimeByToken(UserContext.getToken()));
         return ResultHolder.success(result);
     }
 

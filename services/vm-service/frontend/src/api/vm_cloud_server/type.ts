@@ -53,6 +53,29 @@ interface VmCloudServerVO {
   autoRenew?: boolean;
 }
 
+
+interface VmDefaultVO {
+  id: string;
+  createServerReq?: string;
+  accountId?: string;
+  createTime?: string;
+  createTimeVis?: string;
+  designator?: string;
+  formReq?: string;
+  userId?: string;
+  userName?: string;
+  area?: string;
+  instanceType?: string;
+  os?: string;
+  osVersion?: string;
+}
+
+interface option {
+  id: string;
+  label?: string;
+  value?: string;
+}
+
 /**
  *任务记录
  */
@@ -129,6 +152,10 @@ export interface CreateServerRequest {
   createRequest: string;
 
   fromInfo: string;
+
+  configName: string;
+
+  designator: string;
 }
 
 interface ChangeServerConfigRequest {
@@ -143,6 +170,8 @@ interface GrantRequest {
 }
 
 export type {
+  option,
+  VmDefaultVO,
   VmCloudServerVO,
   ListVmCloudServerRequest,
   CloudServerJobRecord,

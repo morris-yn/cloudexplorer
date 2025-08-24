@@ -28,4 +28,17 @@ public class DefaultVmConfig implements Serializable {
     private String createServerReq;
     @TableField(value = "create_time",updateStrategy = FieldStrategy.IGNORED)
     private java.sql.Timestamp createTime;
+    @TableField(value = "designator",updateStrategy = FieldStrategy.IGNORED)
+    private String designator;
+    @TableField(exist = false)
+    private String userName;
+    @TableField(exist = false)
+    private String userId;
+    @TableField(exist = false)
+    private String name;
+    @TableField(value = "config_name",updateStrategy = FieldStrategy.IGNORED)
+    private String configName;
+
+    @TableField(value = "is_default",updateStrategy = FieldStrategy.IGNORED)
+    private Boolean isDefault;
 }

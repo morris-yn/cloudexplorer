@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import VmCloudServerApi from "@/api/vm_cloud_server";
-import type { VmCloudServerVO } from "@/api/vm_cloud_server/type";
+import type { VmCloudServerVO,VmDefaultVO } from "@/api/vm_cloud_server/type";
 import { useRouter, type TypesConfig } from "vue-router";
 import {
   PaginationConfig,
@@ -144,7 +144,7 @@ const filterVmToolsStatus = (value: string) => {
  */
 const search = (condition: TableSearch) => {
   const params = TableSearch.toSearchParams(condition);
-  VmCloudServerApi.listVmCloudServer(
+  VmCloudServerApi.listVmDefault(
     {
       currentPage: tableConfig.value.paginationConfig.currentPage,
       pageSize: tableConfig.value.paginationConfig.pageSize,
@@ -152,7 +152,17 @@ const search = (condition: TableSearch) => {
     },
     tableLoading
   ).then((res) => {
+    for(let i in res.data.records){
+      let reqdata = res.data.records[i].createServerReq as string
+      let data = JSON.parse(reqdata);
+      res.data.records[i].area = data.zoneId
+      res.data.records[i].instanceType = data.instanceType
+      res.data.records[i].os = data.os
+      res.data.records[i].osVersion = data.osVersion
+      res.data.records[i].createTimeVis = res.data.records[i].createTime?.replace("T"," ").substring(0,19)
+    }
     tableData.value = res.data.records;
+
     tableConfig.value.paginationConfig?.setTotal(
       res.data.total,
       tableConfig.value.paginationConfig
@@ -622,27 +632,7 @@ const createAction = ref<Array<ButtonActionType>>([
  * 表单配置
  */
 const tableConfig = ref<TableConfig>({
-  // searchConfig: {
-  //   showEmpty: false,
-  //   // 查询函数
-  //   search: search,
-  //   quickPlaceholder: t("commons.btn.search", "搜索"),
-  //   components: [],
-  //   searchOptions: [
-  //     {
-  //       label: t("commons.name", "名称"),
-  //       value: "instanceName",
-  //     },
-  //     {
-  //       label: t("vm_cloud_server.label.ip_address", "IP地址"),
-  //       value: "ipArray",
-  //     },
-  //     {
-  //       label: t("commons.os", "操作系统"),
-  //       value: "osInfo",
-  //     },
-  //   ],
-  // },
+  searchConfig: null,
   paginationConfig: new PaginationConfig(),
   tableOperations: new TableOperations([
     TableOperations.buildButtons().newInstance(
@@ -753,12 +743,15 @@ const buttons = ref([
   {
     label: t("设为默认"),
     icon: "",
-    click: (row: VmCloudServerVO) => {
-      powerOn(row);
+    click: (row: VmDefaultVO) => {
+      VmCloudServerApi.setVmDefault(row)
+      .then(res =>{
+        if(res.data) refresh()
+      })
     },
     show: permissionStore.hasPermission("[vm-service]CLOUD_SERVER:START"),
-    disabled: (row: { instanceStatus: string }) => {
-      return row.instanceStatus !== "Stopped";
+    disabled: (row: { isDefault: boolean }) => {
+      return row.isDefault;
     }
   },
   // {
@@ -858,7 +851,6 @@ const exportData = () => {
   <ce-table
     localKey="vmCloudServerTable"
     v-loading="tableLoading"
-    :columns="columns"
     :data="tableData"
     :tableConfig="tableConfig"
     :show-selected-count="true"
@@ -874,291 +866,60 @@ const exportData = () => {
     </template>
     <el-table-column type="selection" />
     <el-table-column
-      :show-overflow-tooltip="true"
-      prop="instanceName"
-      column-key="instanceName"
-      :label="$t('commons.name')"
+      prop="configName"
+      column-key="configName"
+      label="配置名称"
       fixed
       min-width="200px"
-    >
-      <template #default="scope">
-        <span @click="showDetail(scope.row)" class="name-span-class">
-          {{ scope.row.instanceName }}
-        </span>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="remark"
-      column-key="remark"
-      :label="$t('vm_cloud_server.label.remark', '备注')"
-      :show="false"
-      min-width="180px"
     ></el-table-column>
     <el-table-column
-      prop="ipArray"
-      column-key="ipArray"
-      :label="$t('vm_cloud_server.label.ip_address')"
-      min-width="210px"
-    >
-      <template #default="scope">
-        <div
-          class="role_display"
-          :data-var="
-            (scope._list = classifyIP(scope.row.ipArray, scope.row.remoteIp))
-          "
-        >
-          <span v-if="JSON.parse(scope.row.ipArray)?.length > 1">
-            {{ getFirstIp(scope._list) }}
-          </span>
-          <span v-if="JSON.parse(scope.row.ipArray)?.length === 1">
-            {{ getFirstIp(scope._list) }}
-          </span>
-          <el-popover
-            placement="right"
-            :width="200"
-            trigger="hover"
-            v-if="scope._list?.length > 1"
-          >
-            <template #reference>
-              <span class="role_numbers"> +{{ scope._list?.length - 1 }} </span>
-            </template>
-            <div v-for="(item, index) in scope._list" :key="index">
-              <span>{{ item.ip }}</span>
-              <span v-if="item.isPublicIp"> (公) </span>
-            </div>
-          </el-popover>
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="instanceStatus"
-      column-key="instanceStatus"
-      :label="$t('commons.status')"
-      :filters="instanceStatusForTableSelect"
-      :filter-multiple="false"
-      min-width="120px"
-    >
-      <template #default="scope">
-        <div style="display: flex; align-items: center">
-          <VmServerStatusIcon
-            :status="scope.row.instanceStatus"
-          ></VmServerStatusIcon>
-          <span style="margin-left: 7px"
-            >{{ InstanceStatusUtils.getStatusName(scope.row.instanceStatus) }}
-          </span>
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="accountName"
-      column-key="accountIds"
-      :label="$t('commons.cloud_account.native', '云账号')"
-      :filters="cloudAccount"
-      min-width="180px"
-    >
-      <template #default="scope">
-        <div style="display: flex; align-items: center">
-          <PlatformIcon
-            style="height: 16px; width: 16px"
-            :platform="scope.row.platform"
-          ></PlatformIcon>
-          <span style="margin-left: 10px">{{ scope.row.accountName }}</span>
-        </div>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="region"
-      column-key="region"
-      :label="$t('vm_cloud_server.label.region', '区域/数据中心')"
-      :show="false"
-      min-width="180px"
+      prop="area"
+      column-key="area"
+      label="所属区域"
+      fixed
+      min-width="200px"
     ></el-table-column>
     <el-table-column
-      prop="zone"
-      column-key="zone"
-      :label="$t('vm_cloud_server.label.zone', '可用区/集群')"
-      :show="false"
-      min-width="180px"
+      prop="instanceType"
+      column-key="instanceType"
+      label="服务器类型"
+      fixed
+      min-width="200px"
     ></el-table-column>
     <el-table-column
-      prop="organizationName"
-      column-key="organizationIds"
-      :label="$t('commons.org', '组织')"
-      :show="false"
-      min-width="180px"
-    >
-      <template #header>
-        <span :class="{ highlight: selectedOrganizationIds?.length > 0 }">{{
-          $t("commons.org", "组织")
-        }}</span>
-        <el-popover
-          ref="orgPopRef"
-          placement="bottom"
-          :width="200"
-          trigger="click"
-          :show-arrow="false"
-        >
-          <template #reference>
-            <span class="el-table__column-filter-trigger"
-              ><el-icon><ArrowDown /></el-icon
-            ></span>
-          </template>
-          <OrgTreeFilter
-            tree-type="org"
-            ref="orgTreeRef"
-            field="organizationIds"
-            :label="$t('commons.org', '组织')"
-            :popover-ref="orgPopRef"
-            :table-ref="table"
-          />
-        </el-popover>
-      </template>
-      <template #default="scope">
-        <span v-html="scope.row.organizationName"></span>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="workspaceName"
-      column-key="workspaceIds"
-      :label="$t('commons.workspace', '工作空间')"
-      :show="false"
-      min-width="180px"
-    >
-      <template #header>
-        <span :class="{ highlight: selectedWorkspaceIds?.length > 0 }">{{
-          $t("commons.workspace", "工作空间")
-        }}</span>
-        <el-popover
-          ref="workspacePopRef"
-          placement="bottom"
-          :width="200"
-          trigger="click"
-          :show-arrow="false"
-        >
-          <template #reference>
-            <span class="el-table__column-filter-trigger"
-              ><el-icon><ArrowDown /></el-icon
-            ></span>
-          </template>
-          <OrgTreeFilter
-            tree-type="workspace"
-            ref="workspaceTreeRef"
-            field="workspaceIds"
-            :leaf-only="true"
-            :label="$t('commons.workspace', '工作空间')"
-            :popover-ref="workspacePopRef"
-            :table-ref="table"
-          />
-        </el-popover>
-      </template>
-      <template #default="scope">
-        <span v-html="scope.row.workspaceName"></span>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="instanceTypeDescription"
-      column-key="instanceTypeDescription"
-      :label="$t('commons.cloud_server.instance_type')"
-      min-width="160px"
-    >
-      <template #default="scope">
-        <span style="display: flex">{{
-          scope.row.instanceTypeDescription
-        }}</span>
-        <span
-          style="display: flex"
-          v-if="scope.row.instanceType !== scope.row.instanceTypeDescription"
-          >{{ scope.row.instanceType }}</span
-        >
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="osInfo"
-      column-key="osInfo"
-      :label="$t('commons.os_version', '操作系统版本')"
-      min-width="180px"
-      :show="false"
-    />
-    <el-table-column
-      prop="instanceChargeType"
-      column-key="instanceChargeType"
-      :label="$t('cloud_server.label.charge_type', '付费类型')"
-      :filters="chargeType"
-      min-width="120px"
-      :show="false"
-    >
-      <template #default="scope">
-        {{ filterChargeType(scope.row.instanceChargeType) }}
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="host"
-      column-key="host"
-      :label="$t('commons.cloud_account.host', '宿主机')"
-      :show="false"
-      min-width="120px"
+      prop="name"
+      column-key="name"
+      label="支付账户名称"
+      fixed
+      min-width="200px"
     ></el-table-column>
     <el-table-column
-      prop="vmToolsStatus"
-      column-key="vmToolsStatus"
-      :label="$t('cloud_server.label.vm_tools_status', 'VMTools状态')"
-      :filters="vmToolsStatus"
-      :show="false"
-      min-width="180px"
-    >
-      <template #default="scope">
-        {{ filterVmToolsStatus(scope.row.vmToolsStatus) }}
-      </template>
-    </el-table-column>
+      prop="os"
+      column-key="os"
+      label="操作系统"
+      fixed
+      min-width="200px"
+    ></el-table-column>
     <el-table-column
-      prop="expiredTime"
-      column-key="expiredTime"
+      prop="osVersion"
+      column-key="osVersion"
+      label="镜像"
+      fixed
+      min-width="200px"
+    ></el-table-column>
+    <el-table-column
+      prop="createTimeVis"
+      column-key="createTimeVis"
       sortable
-      :label="$t('cloud_server.label.expired_time', '到期时间')"
-      min-width="180px"
-      :show="false"
-    >
-      <template #default="scope">
-        <div>{{ scope.row.expiredTime }}</div>
-        <div style="color: red">
-          {{ getExpiredTimeMessage(scope.row.expiredTime) }}
-        </div></template
-      >
-    </el-table-column>
-    <el-table-column
-      prop="createTime"
-      column-key="createTime"
-      sortable
-      :label="$t('commons.create_time', '创建时间')"
+      label="创建时间"
       min-width="180px"
     ></el-table-column>
     <el-table-column
-      prop="applyUser"
-      column-key="applyUser"
-      :label="$t('commons.cloud_server.creator', '创建人')"
+      prop="userName"
+      column-key="userName"
+      label="归属人"
       min-width="120px"
-      :show="false"
     ></el-table-column>
-    <el-table-column
-      prop="autoRenew"
-      column-key="autoRenew"
-      label="自动续费"
-      :filters="[
-        { text: '是', value: true },
-        { text: '否', value: false },
-      ]"
-      min-width="120px"
-    >
-      <template #default="scope">
-        {{
-          scope.row.instanceChargeType === "PostPaid"
-            ? "--"
-            : scope.row.autoRenew
-            ? "是"
-            : "否"
-        }}
-      </template>
-    </el-table-column>
     <fu-table-operations
       :ellipsis="2"
       :columns="columns"

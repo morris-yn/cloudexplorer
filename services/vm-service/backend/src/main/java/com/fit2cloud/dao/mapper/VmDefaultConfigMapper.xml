@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fit2cloud.dao.mapper.VmDefaultConfigMapper">
+
+    <select id="selectDefaultConfig" resultType="com.fit2cloud.dao.entity.DefaultVmConfig">
+        SELECT default_vm_config.*, account.name, valid.user_name AS userName, valid.user_id AS userId
+        FROM default_vm_config
+                 LEFT JOIN cloud_account account ON default_vm_config.account_id = account.id
+                 LEFT JOIN user_validtime valid ON default_vm_config.designator = valid.user_id
+    </select>
+
+
+</mapper>
