@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import VmCloudServerApi from "@/api/vm_cloud_server";
-import type { VmCloudServerVO,VmDefaultVO } from "@/api/vm_cloud_server/type";
+import type {onlineInfo, VmCloudServerVO, VmDefaultVO} from "@/api/vm_cloud_server/type";
 import { useRouter, type TypesConfig } from "vue-router";
 import {
   PaginationConfig,
@@ -35,7 +35,7 @@ const permissionStore = usePermissionStore();
 const useRoute = useRouter();
 const table = ref<any>(null);
 const columns = ref([]);
-const tableData = ref<Array<VmCloudServerVO>>([]);
+const tableData = ref<Array<onlineInfo>>([]);
 const selectedRowData = ref<Array<VmCloudServerVO>>([]);
 const tableLoading = ref<boolean>(false);
 const cloudAccount = ref<Array<SimpleMap<string>>>([]);
@@ -144,7 +144,7 @@ const filterVmToolsStatus = (value: string) => {
  */
 const search = (condition: TableSearch) => {
   const params = TableSearch.toSearchParams(condition);
-  VmCloudServerApi.listVmDefault(
+  VmCloudServerApi.listOnline(
     {
       currentPage: tableConfig.value.paginationConfig.currentPage,
       pageSize: tableConfig.value.paginationConfig.pageSize,
@@ -152,15 +152,6 @@ const search = (condition: TableSearch) => {
     },
     tableLoading
   ).then((res) => {
-    for(let i in res.data.records){
-      let reqdata = res.data.records[i].createServerReq as string
-      let data = JSON.parse(reqdata);
-      res.data.records[i].area = data.zoneId
-      res.data.records[i].instanceType = data.instanceType
-      res.data.records[i].os = data.os
-      res.data.records[i].osVersion = data.osVersion
-      res.data.records[i].createTimeVis = res.data.records[i].createTime?.replace("T"," ").substring(0,19)
-    }
     tableData.value = res.data.records;
 
     tableConfig.value.paginationConfig?.setTotal(
@@ -176,7 +167,6 @@ const search = (condition: TableSearch) => {
 
 const refresh = () => {
   table.value.search();
-  search(new TableSearch())
 };
 
 /**
@@ -569,14 +559,14 @@ const disableBatch = computed<boolean>(() => {
         );
 });
 const createAction = ref<Array<ButtonActionType>>([
-  new ButtonAction(
-    t("commons.btn.create", "创建") +
-      t("vm_cloud_server.label.cloudVm", "默认云主机配置"),
-    "primary",
-    undefined,
-    gotoCatalog,
-    permissionStore.hasPermission("[vm-service]CLOUD_SERVER:CREATE")
-  ),
+  // new ButtonAction(
+  //   t("commons.btn.create", "创建") +
+  //     t("vm_cloud_server.label.cloudVm", "默认云主机配置"),
+  //   "primary",
+  //   undefined,
+  //   gotoCatalog,
+  //   permissionStore.hasPermission("[vm-service]CLOUD_SERVER:CREATE")
+  // ),
 ]);
 // const moreActions = ref<Array<ButtonActionType>>([
 //   new ButtonAction(
@@ -755,21 +745,6 @@ const buttons = ref([
       return row.isDefault;
     }
   },
-  {
-    label: t("commons.btn.delete", "删除"),
-    icon: "",
-    type: "danger",
-    click: (row: VmDefaultVO) => {
-      VmCloudServerApi.delVmdefault(row)
-              .then(res =>{
-                if(res.data) refresh()
-              })
-    },
-    show: permissionStore.hasPermission("[vm-service]CLOUD_SERVER:START"),
-    disabled: (row: { isDefault: boolean }) => {
-      return row.isDefault;
-    }
-  }
   // {
   //   label: t("vm_cloud_server.btn.shutdown", "关机"),
   //   icon: "",
@@ -864,12 +839,29 @@ const exportData = () => {
 };
 </script>
 <template>
+  <div>
+    <el-button type="primary" @click="search(new TableSearch())">
+      <template #icon>
+        <!-- 刷新图标 (自定义 SVG) -->
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="16" height="16"
+             viewBox="0 0 24 24"
+             fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="M3.51 9a9 9 0 0114.13-3.36L23 10"></path>
+          <path d="M20.49 15a9 9 0 01-14.13 3.36L1 14"></path>
+        </svg>
+      </template>
+    </el-button>
+  </div>
   <ce-table
     localKey="vmCloudServerTable"
     v-loading="tableLoading"
     :data="tableData"
     :tableConfig="tableConfig"
-    :show-selected-count="true"
+    :show-selected-count="false"
     @selection-change="handleSelectionChange"
     @clearCondition="clearCondition"
     row-key="id"
@@ -882,67 +874,98 @@ const exportData = () => {
     </template>
 <!--    <el-table-column type="selection" />-->
     <el-table-column
-      prop="configName"
-      column-key="configName"
-      label="配置名称"
-      fixed
+      prop="isOnline"
+      column-key="isOnline"
+      label="是否在线"
+
+      min-width="100px"
+    >
+      <template #default="scope">
+        <div style="display: flex;margin-left: 25%">
+          <div v-if="scope.row.isOnline" style="background-color: greenyellow;width: 10px;height: 10px;border: 1px solid black"></div>
+          <div v-else style="background-color: red;width: 10px;height: 10px;border: 1px solid black"></div>
+        </div>
+      </template>
+    </el-table-column>
+    <el-table-column
+      prop="sendIp"
+      column-key="sendIp"
+      label="推流端ip"
+
       min-width="200px"
     ></el-table-column>
     <el-table-column
-      prop="area"
-      column-key="area"
-      label="所属区域"
-      fixed
+            prop="sendLocation"
+            column-key="sendLocation"
+            label="推流端位置"
+
+            min-width="200px"
+    ></el-table-column>
+    <el-table-column
+            prop="sendOperator"
+            column-key="sendOperator"
+            label="推流端服务商"
+
+            min-width="200px"
+    ></el-table-column>
+    <el-table-column
+      prop="receiveIp"
+      column-key="receiveIp"
+      label="拉流端ip"
+
+      min-width="100px"
+    ></el-table-column>
+
+    <el-table-column
+      prop="receiveServer"
+      column-key="receiveServer"
+      label="拉流端服务器实例名称"
+
       min-width="200px"
     ></el-table-column>
     <el-table-column
-      prop="instanceType"
-      column-key="instanceType"
-      label="服务器类型"
-      fixed
-      min-width="200px"
-    ></el-table-column>
+            prop="receiveStatus"
+            column-key="receiveStatus"
+            label="服务器状态"
+            :filters="instanceStatusForTableSelect"
+            :filter-multiple="false"
+            min-width="120px"
+    >
+      <template #default="scope">
+        <div v-if="scope.row.receiveStatus != '-'" style="display: flex; align-items: center">
+          <VmServerStatusIcon
+                  :status="scope.row.receiveStatus"
+          ></VmServerStatusIcon>
+          <span style="margin-left: 7px"
+          >{{ InstanceStatusUtils.getStatusName(scope.row.receiveStatus) }}
+          </span>
+        </div>
+        <div v-else>
+          {{scope.row.receiveStatus}}
+        </div>
+      </template>
+    </el-table-column>
     <el-table-column
-      prop="name"
-      column-key="name"
-      label="支付账户名称"
-      fixed
-      min-width="200px"
-    ></el-table-column>
-    <el-table-column
-      prop="os"
-      column-key="os"
-      label="操作系统"
-      fixed
-      min-width="200px"
-    ></el-table-column>
-    <el-table-column
-      prop="osVersion"
-      column-key="osVersion"
-      label="镜像"
-      fixed
-      min-width="200px"
-    ></el-table-column>
-    <el-table-column
-      prop="createTimeVis"
-      column-key="createTimeVis"
+      prop="createTime"
+      column-key="createTime"
       sortable
       label="创建时间"
       min-width="180px"
     ></el-table-column>
     <el-table-column
-      prop="userName"
-      column-key="userName"
+      prop="belong"
+      column-key="belong"
+
       label="归属人"
       min-width="120px"
     ></el-table-column>
-    <fu-table-operations
-      :ellipsis="2"
-      :columns="columns"
-      :buttons="buttons"
-      :label="$t('commons.operation')"
-      fixed="right"
-    />
+<!--    <fu-table-operations-->
+<!--      :ellipsis="2"-->
+<!--      :columns="columns"-->
+<!--      :buttons="buttons"-->
+<!--      :label="$t('commons.operation')"-->
+<!--      ="right"-->
+<!--    />-->
 
     <template #buttons>
       <!-- 导出 -->

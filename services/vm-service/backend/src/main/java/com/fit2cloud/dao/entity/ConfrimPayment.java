@@ -8,4 +8,6 @@ import lombok.Setter;
 @Setter
 public class ConfrimPayment {
     private String orderId;
+
+    private String logId;
 }

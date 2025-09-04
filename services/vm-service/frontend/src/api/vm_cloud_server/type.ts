@@ -70,6 +70,18 @@ interface VmDefaultVO {
   osVersion?: string;
 }
 
+interface onlineInfo {
+  isOnline: boolean;
+  sendIp?: string;
+  sendLocation?: string;
+  sendOperator?: string;
+  receiveIp?: string;
+  receiveServer?: string;
+  receiveStatus?: string;
+  createTime?: string;
+  belong?: string;
+}
+
 interface option {
   id: string;
   label?: string;
@@ -170,6 +182,7 @@ interface GrantRequest {
 }
 
 export type {
+  onlineInfo,
   option,
   VmDefaultVO,
   VmCloudServerVO,

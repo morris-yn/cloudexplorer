@@ -34,7 +34,9 @@ import com.fit2cloud.controller.request.vm.BatchOperateVmRequest;
 import com.fit2cloud.controller.request.vm.ChangeServerConfigRequest;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
 import com.fit2cloud.controller.request.vm.PageVmCloudServerRequest;
+import com.fit2cloud.dao.entity.VmUser;
 import com.fit2cloud.dao.mapper.VmCloudServerMapper;
+import com.fit2cloud.dao.mapper.VmUserMapper;
 import com.fit2cloud.dto.InitJobRecordDTO;
 import com.fit2cloud.dto.UserDto;
 import com.fit2cloud.dto.VmCloudServerDTO;
@@ -99,6 +101,9 @@ public class VmCloudServerServiceImpl extends ServiceImpl<BaseVmCloudServerMappe
 
     @Resource
     private BaseJobRecordResourceMappingMapper baseJobRecordResourceMappingMapper;
+
+    @Resource
+    private VmUserMapper vmUserMapper;
 
     /**
      * 云主机批量操作
@@ -656,6 +661,77 @@ public class VmCloudServerServiceImpl extends ServiceImpl<BaseVmCloudServerMappe
 
             createServerJob(vmCloudServer.getId(), JsonUtil.toJSONString(requestObj), request, OperatedTypeEnum.CREATE_SERVER.getDescription(), this::modifyResource, jobRecordCommonService::initJobRecord, jobRecordCommonService::modifyJobRecord);
 
+        }
+
+        return true;
+    }
+
+    public boolean createServerForVm(CreateServerRequest request,String userId) {
+
+        CloudAccount cloudAccount = cloudAccountService.getById(request.getAccountId());
+        ICloudProvider iCloudProvider = PluginsContextHolder.getPlatformExtension(ICloudProvider.class, cloudAccount.getPlatform());
+
+        Class<? extends ICreateServerRequest> createRequest = iCloudProvider.getCreateServerRequestClass();
+
+        ICreateServerRequest requestObj = JsonUtil.parseObject(request.getCreateRequest(), createRequest);
+
+        //设置账号信息
+        requestObj.setCredential(cloudAccount.getCredential());
+        CheckCreateServerResult checkCreateServerResult = iCloudProvider.validateServerCreateRequest(JsonUtil.toJSONString(requestObj));
+        if (!checkCreateServerResult.isPass()) {
+            throw new RuntimeException(checkCreateServerResult.getErrorInfo());
+        }
+
+        int count = requestObj.getCount();
+
+        UserDto currentUser = CurrentUserUtils.getUser();
+        Optional.ofNullable(currentUser).orElseThrow(() -> new RuntimeException("Can not get current user."));
+
+        String sourceId = currentUser.getCurrentSource();
+        for (int i = 0; i < count; i++) {
+
+            //设置index
+            requestObj.setIndex(i);
+
+            //提前设置uuid
+            String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+            requestObj.setId(uuid);
+
+            //先插入数据库占位
+            F2CVirtualMachine tempData = iCloudProvider.getSimpleServerByCreateRequest(JsonUtil.toJSONString(requestObj));
+
+            VmCloudServer vmCloudServer = new VmCloudServer();
+            BeanUtils.copyProperties(tempData, vmCloudServer);
+            vmCloudServer.setInstanceName(tempData.getName());
+            vmCloudServer.setAccountId(request.getAccountId());
+            vmCloudServer.setUpdateTime(DateUtil.getSyncTime());
+            vmCloudServer.setIpArray(JsonUtil.toJSONString(tempData.getIpArray()));
+            vmCloudServer.setInstanceStatus(F2CInstanceStatus.WaitCreating.name());
+            vmCloudServer.setApplyUser(currentUser.getUsername());
+            vmCloudServer.setRemark(tempData.getRemark());
+            if (Objects.nonNull(tempData.getExpiredTime())) {
+                vmCloudServer.setExpiredTime(new Date(tempData.getExpiredTime()).toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
+            }
+            if (vmCloudServer.getRemark() != null && vmCloudServer.getRemark().length() > 128) {
+                throw new RuntimeException("云主机备注长度不能超过128个字符");
+            }
+
+            if (!CurrentUserUtils.isAdmin() && StringUtils.isNotBlank(sourceId)) {
+                vmCloudServer.setSourceId(sourceId);
+            }
+            this.save(vmCloudServer);
+
+
+
+
+            //执行创建
+            //F2CVirtualMachine result = CommonUtil.exec(cloudProvider, JsonUtil.toJSONString(requestObj), ICloudProvider::createVirtualMachine);
+
+            createServerJob(vmCloudServer.getId(), JsonUtil.toJSONString(requestObj), request, OperatedTypeEnum.CREATE_SERVER.getDescription(), this::modifyResource, jobRecordCommonService::initJobRecord, jobRecordCommonService::modifyJobRecord);
+            VmUser vmUser = new VmUser();
+            vmUser.setVmServerId(Long.parseLong(vmCloudServer.getId()));
+            vmUser.setUserId(Long.parseLong(userId));
+            vmUserMapper.insert(vmUser);
         }
 
         return true;

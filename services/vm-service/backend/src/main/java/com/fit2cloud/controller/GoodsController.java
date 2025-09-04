@@ -1,24 +1,20 @@
 package com.fit2cloud.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fit2cloud.controller.handler.ResultHolder;
-import com.fit2cloud.dao.entity.CDcard;
-import com.fit2cloud.dao.entity.ConfrimPayment;
-import com.fit2cloud.dao.entity.GoodsToCart;
-import com.fit2cloud.dao.entity.LiveGoods;
+import com.fit2cloud.controller.request.vm.CreateServerRequest;
+import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.service.IGoodsService;
 import com.fit2cloud.service.IVmDefaultService;
 import com.fit2cloud.utils.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,8 +88,8 @@ public class GoodsController {
     @Operation(summary = "", description = "心跳接口")
     @PostMapping("/heart")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Boolean> heart() {
-        return ResultHolder.success(iVmDefaultService.heart());
+    public ResultHolder<Boolean> heart(HttpServletRequest request) {
+        return ResultHolder.success(iVmDefaultService.heart(request));
     }
 
 
@@ -105,4 +101,42 @@ public class GoodsController {
         return ResultHolder.message(map.get("code"),map.get("msg"),null);
     }
 
+
+    @Operation(summary = "", description = "服务列表")
+    @PostMapping("/serviceList")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> serviceList() {
+        return ResultHolder.message(200,"ok",iVmDefaultService.getServiceList());
+    }
+
+
+    @Operation(summary = "", description = "设备列表")
+    @PostMapping("/equipmentList")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> equipmentList() {
+        return ResultHolder.message(200,"ok",iVmDefaultService.getEquipmentList());
+    }
+
+    @Operation(summary = "", description = "设备详情")
+    @GetMapping("/getEquipDetail")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> equipmentDetail(@RequestParam("uid") String uid) {
+        return ResultHolder.message(200,"ok",iVmDefaultService.getEquipmentDetail(uid));
+    }
+
+
+    @Operation(summary = "", description = "获取账号二维码")
+    @GetMapping("/getUserQR")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> getUserQR() {
+        return ResultHolder.message(200,"ok",iVmDefaultService.getUserQR());
+    }
+
+
+    @Operation(summary = "", description = "扫二维码添加子账号")
+    @GetMapping("/addSubUser")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> addSubUser(@RequestParam("cecode") String info) {
+        return ResultHolder.message(200,"ok",iVmDefaultService.addSubUser(info));
+    }
 }

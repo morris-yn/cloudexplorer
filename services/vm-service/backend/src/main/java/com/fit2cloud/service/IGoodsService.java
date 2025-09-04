@@ -22,7 +22,7 @@ public interface IGoodsService {
 
     List<LiveGoods> getList(LiveGoods goods);
 
-    Map<String,String> getNativeQR(GoodsToCart goods) throws Exception;
+    Map<String,Object> getNativeQR(GoodsToCart goods) throws Exception;
 
     Boolean confirmPayment(ConfrimPayment confrimPayment);
 

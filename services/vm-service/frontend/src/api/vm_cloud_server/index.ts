@@ -4,6 +4,7 @@ import type { Page } from "@commons/request/Result";
 import type {
   VmDefaultVO,
   VmCloudServerVO,
+  onlineInfo,
   ListVmCloudServerRequest,
   CreateServerRequest,
   CloudServerJobRecord,
@@ -41,6 +42,18 @@ export function listVmDefault(
 }
 
 /**
+ * 默认配置列表
+ * @param req
+ * @param loading
+ */
+export function listOnline(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Page<onlineInfo>>> {
+  return get("/api/default/infoList", req, loading);
+}
+
+/**
  * 设置默认配置
  * @param req
  * @param loading
@@ -51,6 +64,15 @@ export function setVmDefault(
 ): Promise<Result<boolean>> {
   return post("api/default/set", null, req, loading);
 }
+
+
+export function delVmdefault(
+    req: VmDefaultVO,
+    loading?: Ref<boolean>
+): Promise<Result<boolean>> {
+  return post("api/default/del", null, req, loading);
+}
+
 
 /**
  * 关机
@@ -224,9 +246,9 @@ export function createDefaultServer(
 
 /**
  * 获取指定人
- * @param req 
- * @param loading 
- * @returns 
+ * @param req
+ * @param loading
+ * @returns
  */
 export function getDesignators(
   loading?: Ref<boolean>
@@ -343,6 +365,8 @@ const exportData = (req: any, loading: Ref<boolean>) => {
 };
 
 const VmCloudServerApi = {
+  delVmdefault,
+  listOnline,
   setVmDefault,
   listVmDefault,
   listVmCloudServer,

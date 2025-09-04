@@ -59,6 +59,8 @@ public interface IVmCloudServerService extends IService<VmCloudServer> {
 
     boolean createServer(CreateServerRequest request);
 
+    boolean createServerForVm(CreateServerRequest request, String userId);
+
     boolean changeConfig(ChangeServerConfigRequest request);
 
     FormObject getConfigUpdateForm(String platform);

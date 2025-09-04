@@ -20,4 +20,9 @@ public interface LiveGoodsMapper extends BaseMapper<LiveGoods> {
 
     @Select("select userid from live_sessions where sessKey = #{sessionkey}")
     public String selectUserId(@Param("sessionkey") String sessionKey);
+
+
+    @Select("select log.log_id from live_order_info info left join live_pay_log log on info.order_id = log.order_id " +
+            "where info.order_sn = #{orderId}")
+    public String getPayLogId(@Param("orderId") String orderId);
 }

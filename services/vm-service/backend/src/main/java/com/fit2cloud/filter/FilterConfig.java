@@ -32,7 +32,7 @@ public class FilterConfig {
     public FilterRegistrationBean<loginInfoCheck> loggingFilter() {
         FilterRegistrationBean<loginInfoCheck> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new loginInfoCheck(liveGoodsMapper));
-        registrationBean.addUrlPatterns("/vm-service/goods/*");
+        registrationBean.addUrlPatterns("/goods/*");
         registrationBean.setOrder(1); // 过滤器顺序，值越小越优先
         return registrationBean;
     }
@@ -46,7 +46,14 @@ public class FilterConfig {
         public void doFilter(ServletRequest request, ServletResponse response,
                              FilterChain chain) throws IOException, ServletException {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
-            String token = httpRequest.getHeader("token");
+            String token = httpRequest.getHeader("Authorization");
+            if(token == null){
+                HttpServletResponse httpResponse = (HttpServletResponse) response;
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 设置 401 状态码
+                httpResponse.setContentType("application/json;charset=UTF-8");
+                httpResponse.getWriter().write("{\"code\":401, \"msg\":\"空token\"}");
+                return;
+            }
             Object userData = RedisUtils.get(token);
             //获取userinfo
             if(ObjectUtils.isEmpty(userData)){
@@ -73,6 +80,14 @@ public class FilterConfig {
                 userData = resStr;
                 RedisUtils.set(token,userData);
             }else{
+                String userId = liveGoodsMapper.selectUserId(token);
+                if(userId == null){
+                    HttpServletResponse httpResponse = (HttpServletResponse) response;
+                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 设置 401 状态码
+                    httpResponse.setContentType("application/json;charset=UTF-8");
+                    httpResponse.getWriter().write("{\"code\":401, \"msg\":\"token已过期\"}");
+                    return;
+                }
                 //验证登录有效性
                 RequestBody req = new FormBody.Builder()
                         .add("user_id",liveGoodsMapper.selectUserId(token))

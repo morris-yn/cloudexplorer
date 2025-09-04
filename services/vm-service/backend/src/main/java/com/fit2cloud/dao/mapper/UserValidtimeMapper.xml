@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fit2cloud.dao.mapper.UserValidtimeMapper">
+
+    <select id="selectUserValidtime" resultType="com.fit2cloud.dao.entity.UserValidtime">
+        SELECT *
+        FROM user_validtime
+    </select>
+
+    <select id="selectVmCloudServerByUserId" resultType="com.fit2cloud.base.entity.VmCloudServer">
+        SELECT *
+        FROM vm_user vmuser left join vm_cloud_server server on vmuser.vm_server_id = server.id
+        where vmuser.user_id = #{userId}
+    </select>
+
+    <select id="selectAllVmCloudServerByUserId" resultType="com.alibaba.fastjson2.JSONObject">
+        select sub.sub_user_id as uid,s.instance_name, s.remote_ip,s.region
+        from user_sub sub
+                 left join vm_user vm on vm.user_id = sub.sub_user_id
+                 left join vm_cloud_server s on s.id = vm.vm_server_id
+        where sub.user_id = #{userId}
+        union
+
+        select vm.user_id as uid,s.instance_name,s.remote_ip,s.region
+        from vm_user vm
+                 left join vm_cloud_server s on s.id = vm.vm_server_id
+        where vm.user_id = #{userId}
+    </select>
+</mapper>

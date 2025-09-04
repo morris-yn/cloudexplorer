@@ -44,6 +44,8 @@ public class GoodsServiceImpl implements IGoodsService {
     @Resource
     UserValidtimeMapper userValidtimeMapper;
 
+    private static OkHttpClient client = new OkHttpClient();
+
 
     String sessionId = "";
 
@@ -56,12 +58,12 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public Map<String,String> getNativeQR(GoodsToCart goods) throws Exception {
+    public Map<String,Object> getNativeQR(GoodsToCart goods) throws Exception {
         //判断是否只可购买一次
 
 
         //
-        OkHttpClient client = new OkHttpClient();
+//        OkHttpClient client = new OkHttpClient();
         if("".equals(sessionId)){
             RequestBody req = new FormBody.Builder()
                 .add("username", "ceshia")
@@ -122,6 +124,7 @@ public class GoodsServiceImpl implements IGoodsService {
                 .add("x", "43")
                 .add("y", "22")
                 .add("step", "done")
+                .add("postscript","购买用户id:"+ liveGoodsMapper.selectUserId(UserContext.getToken()))
                 .build();
 
         // 构造请求
@@ -166,9 +169,12 @@ public class GoodsServiceImpl implements IGoodsService {
             throw e;
         }
 
-        Map<String,String> result = new HashMap<>();
+        Map<String,Object> result = new HashMap<>();
         result.put("QRcode",qrcode);
         result.put("orderId",orderId);
+        String payLogId = liveGoodsMapper.getPayLogId(orderId);
+        result.put("payLogId",payLogId);
+        result.put("retired",5);
         LogUtils.setLog(LogContants.ORDER.getCode(),JSONObject.toJSONString(result));
         return result;
     }
@@ -176,8 +182,25 @@ public class GoodsServiceImpl implements IGoodsService {
     @Override
     public Boolean confirmPayment(ConfrimPayment confrimPayment) {
         PayStatus payStatus = liveGoodsMapper.selectPayStatus(confrimPayment.getOrderId());
+        Integer payLogStatus = null;
+        Request request = new Request.Builder()
+                .url("https://shop.livepartner.fans//respond.php?code=wxpaynative&check=true&log_id="+confrimPayment.getLogId())
+                .addHeader("Cookie", sessionId)
+                .get()
+                .build();
+        Response response = null;
 
-        if(!payStatus.getIsPaid()){
+        try {
+            response = client.newCall(request).execute();
+            String resStr = response.body().string();
+            JSONObject resoj = JSONObject.parseObject(resStr);
+            payLogStatus = resoj.getInteger("error");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        if(payLogStatus != 0){
             return false;
         }
 
@@ -192,14 +215,14 @@ public class GoodsServiceImpl implements IGoodsService {
             userValidtime.setVaildTime(time);
             userValidtimeMapper.updateById(userValidtime);
         }
-        return payStatus.getIsPaid();
+        return true;
     }
 
     @Override
     public LocalDateTime getVaildTimeByToken(String token) {
         QueryWrapper wrapper = new QueryWrapper<UserValidtime>().eq("user_id",liveGoodsMapper.selectUserId(UserContext.getToken()));
-
-        return  userValidtimeMapper.selectOne(wrapper).getVaildTime();
+        UserValidtime userValidtime= userValidtimeMapper.selectOne(wrapper);
+        return  userValidtime == null ?  LocalDateTime.now() :userValidtime.getVaildTime();
     }
 
     @Override
