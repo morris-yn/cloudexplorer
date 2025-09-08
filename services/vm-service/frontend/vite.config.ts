@@ -13,11 +13,13 @@ export default defineConfig(({ mode }) => {
   const ENV = loadEnv(mode, envDir);
   const proxyConf: Record<string, string | ProxyOptions> = {};
   proxyConf[ENV.VITE_BASE_PATH + "api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "login"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
-
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   return {
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false)
+    },
     server: {
       cors: true,
       host: "0.0.0.0",

@@ -26,7 +26,7 @@ public interface IGoodsService {
 
     Boolean confirmPayment(ConfrimPayment confrimPayment);
 
-    LocalDateTime getVaildTimeByToken(String token);
+    Long getVaildTimeByToken(String token);
 
     Map<String,String> writeoff(CDcard card);
 }

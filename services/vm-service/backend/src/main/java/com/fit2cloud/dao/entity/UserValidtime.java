@@ -18,8 +18,37 @@ public class UserValidtime {
   private String userName;
   private LocalDateTime vaildTime;
 
+  private LocalDateTime serverAVt;
 
-  public long getId() {
+  private LocalDateTime serverBVt;
+
+  private Boolean first;
+
+    public Boolean getFirst() {
+        return first;
+    }
+
+    public void setFirst(Boolean first) {
+        this.first = first;
+    }
+
+    public LocalDateTime getServerAVt() {
+        return serverAVt;
+    }
+
+    public void setServerAVt(LocalDateTime serverAVt) {
+        this.serverAVt = serverAVt;
+    }
+
+    public LocalDateTime getServerBVt() {
+        return serverBVt;
+    }
+
+    public void setServerBVt(LocalDateTime serverBVt) {
+        this.serverBVt = serverBVt;
+    }
+
+    public long getId() {
     return id;
   }
 

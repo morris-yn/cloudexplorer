@@ -254,11 +254,32 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             JSONArray rows = resJo.getJSONObject("data").getJSONArray("rows");
 
             yunboRow.put("id", 99991);
+            yunboRow.put("cat_id",47);
             yunboRow.put("goods_name", "云播");
+            yunboRow.put("desc","通过云技术，实现不同直播账号的无缝切换，异地切换主播而不需停播。");
+            yunboRow.put("original_img_url","http://weibo-app.oss-cn-hangzhou.aliyuncs.com/images/202508/source_img/6499_G_1754908393217.jpg");
             newRows.add(yunboRow);
             for (Object item : rows) {
-                ((JSONObject) item).put("is_open", true);
-                newRows.add(item);
+                JSONObject jitem = (JSONObject) item;
+                jitem.put("is_open", false);
+                if(jitem.getInteger("id") == 6194 || jitem.getInteger("id") == 6345){
+
+                    if(jitem.getInteger("id") == 6194){
+                        if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
+                            jitem.put("is_open", false);
+                        } else {
+                            jitem.put("is_open", true);
+                        }
+                    }
+                    if(jitem.getInteger("id") == 6345){
+                        if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
+                            jitem.put("is_open", false);
+                        } else {
+                            jitem.put("is_open", true);
+                        }
+                    }
+                    newRows.add(item);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

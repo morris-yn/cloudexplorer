@@ -35,6 +35,9 @@ const envDir = "./env";
 export default defineConfig(({ mode }: ConfigEnv) => {
   const ENV = loadEnv(mode, envDir);
   const config = {
+    define: {
+      __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false)
+    },
     plugins: [
       //alias(),
       vue({
@@ -72,41 +75,41 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
   const proxyConf: Record<string, string | ProxyOptions> = {};
   proxyConf[ENV.VITE_BASE_PATH + "api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "login"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "logout"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
 
   //management-center
   proxyConf[ENV.VITE_BASE_PATH + "management-center/api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "management-center?management-center"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
-  proxyConf[ENV.VITE_BASE_PATH + "management-center"] = "http://localhost:5001";
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
+  proxyConf[ENV.VITE_BASE_PATH + "management-center"] = "http://121.37.97.46:5001";
 
   //vm-service
   proxyConf[ENV.VITE_BASE_PATH + "vm-service/api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
-  proxyConf[ENV.VITE_BASE_PATH + "vm-service"] = "http://localhost:5002";
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
+  proxyConf[ENV.VITE_BASE_PATH + "vm-service"] = "http://121.37.97.46:5002";
 
   //finance-management
   proxyConf[ENV.VITE_BASE_PATH + "finance-management/api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "finance-management"] =
-    "http://localhost:5003";
+    "http://121.37.97.46:5003";
 
   //security-compliance
   proxyConf[ENV.VITE_BASE_PATH + "security-compliance/api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "security-compliance"] =
-    "http://localhost:5004";
+    "http://121.37.97.46:5004";
 
   //operation-analysis
   proxyConf[ENV.VITE_BASE_PATH + "operation-analysis/api"] =
-    "http://localhost:" + Number(ENV.VITE_BASE_API_PORT);
+    "http://121.37.97.46:" + Number(ENV.VITE_BASE_API_PORT);
   proxyConf[ENV.VITE_BASE_PATH + "operation-analysis"] =
-    "http://localhost:5005";
+    "http://121.37.97.46:5005";
 
   //PROXY_PLACEHOLDER
 
@@ -118,6 +121,5 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     strictPort: true,
     proxy: proxyConf,
   };
-
   return config;
 });

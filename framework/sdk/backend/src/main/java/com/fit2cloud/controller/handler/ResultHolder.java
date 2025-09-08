@@ -21,7 +21,7 @@ public class ResultHolder<T> {
         return this;
     }
 
-    public static<T> ResultHolder<T> message(Object code,Object msg,T data) {
+    public static<T> ResultHolder<T> of(Object code,Object msg,T data) {
         return new ResultHolder<T>()
                 .code(Integer.parseInt(code.toString()))
                 .message(msg.toString())

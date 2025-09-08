@@ -1,0 +1,6 @@
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:35:41.934 [qtp915404990-32] DEBUG com.fit2cloud.dao.goodsMapper.LiveGoodsMapper.selectUserId#?:? -==>  Preparing: select userid from live_sessions where sessKey = ?
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:35:41.935 [qtp915404990-32] DEBUG com.fit2cloud.dao.goodsMapper.LiveGoodsMapper.selectUserId#?:? -==> Parameters: 6aa87e439eaa472ba96365b2ddefe205(String)
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:35:41.996 [qtp915404990-32] DEBUG com.fit2cloud.dao.goodsMapper.LiveGoodsMapper.selectUserId#?:? -<==      Total: 1
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:35:41.999 [qtp915404990-32] DEBUG com.fit2cloud.dao.goodsMapper.LiveGoodsMapper.selectUserId#?:? -==>  Preparing: select userid from live_sessions where sessKey = ?
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:35:41.999 [qtp915404990-32] DEBUG com.fit2cloud.dao.goodsMapper.LiveGoodsMapper.selectUserId#?:? -==> Parameters: 6aa87e439eaa472ba96365b2ddefe205(String)
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:35:42.060 [qtp915404990-32] DEBUG com.fit2cloud.dao.goodsMapper.LiveGoodsMapper.selectUserId#?:? -<==      Total: 1

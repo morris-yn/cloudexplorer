@@ -1,53 +1,229 @@
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:43:54.158 [DiscoveryClient-HeartbeatExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:43:57.371 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:48:32.677 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#?:? -Resolving eureka endpoints via configuration
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:51:58.340 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#?:? -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:52:28.408 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:53:32.678 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#getClusterEndpoints:43 -Resolving eureka endpoints via configuration
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:53:58.598 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:54:11.685 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.PoolBase#isConnectionDead:179 -HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@7d1123bf (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:54:16.687 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.PoolBase#?:? -HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@59d64a67 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:54:21.692 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.PoolBase#isConnectionDead:179 -HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@44809565 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:54:26.864 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.PoolBase#?:? -HikariPool-2 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@5bd9eae5 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:54:31.867 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.PoolBase#isConnectionDead:179 -HikariPool-2 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@1dfa11af (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 21:58:32.680 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#getClusterEndpoints:43 -Resolving eureka endpoints via configuration
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:00:00.329 [pool-14-thread-243] INFO  com.fit2cloud.quartz.CloudAccountSyncJob$RenewInstance#?:? -Method[run][开始自动续费任务]
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:00:00.454 [pool-14-thread-243] INFO  com.fit2cloud.quartz.CloudAccountSyncJob$RenewInstance#?:? -Method[run][结束自动续费任务]
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:02:57.472 [DiscoveryClient-HeartbeatExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:03:32.681 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#getClusterEndpoints:43 -Resolving eureka endpoints via configuration
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:08:32.693 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#?:? -Resolving eureka endpoints via configuration
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:09:51.784 [OkHttp ConnectionPool] WARN  okhttp3.OkHttpClient#?:? -A connection to https://shop.livepartner.fans/ was leaked. Did you forget to close a response body? To see where this was allocated, set the OkHttpClient logger level to FINE: Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.800 [SpringApplicationShutdownHook] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry#?:? -Unregistering application VM-SERVICE with eureka with status DOWN
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.801 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -Saw local status change event StatusChangeEvent [timestamp=1753798361801, current=DOWN, previous=UP]
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.807 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.Server#?:? -Stopped Server@1c6912db{STOPPING}[11.0.15,sto=0]
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.810 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.AbstractConnector#?:? -Stopped ServerConnector@2c8d537e{HTTP/1.1, (http/1.1)}{0.0.0.0:9911}
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.811 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler.application#?:? -Destroying Spring FrameworkServlet 'dispatcherServletRegistration'
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.813 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler#?:? -Stopped o.s.b.w.e.j.JettyEmbeddedWebAppContext@543982ac{application,/,[file:///C:/Users/%E9%A2%9C%E8%B1%AA%E7%94%B7/AppData/Local/Temp/jetty-docbase.9911.4815133104584791198/, jar:file:/D:/data/.m2/org/webjars/swagger-ui/4.18.2/swagger-ui-4.18.2.jar!/META-INF/resources],STOPPED}
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.826 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service paused.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.826 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.Server#?:? -Stopped Server@3355d9ba{STOPPING}[11.0.15,sto=0]
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.827 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.AbstractConnector#?:? -Stopped ServerConnector@194eae3e{HTTP/1.1, (http/1.1)}{0.0.0.0:9011}
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.829 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler.application#?:? -Destroying Spring FrameworkServlet 'dispatcherServlet'
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.829 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler#?:? -Stopped o.s.b.w.e.j.JettyEmbeddedWebAppContext@5b72b13a{application,/vm-service,[file:///C:/Users/%E9%A2%9C%E8%B1%AA%E7%94%B7/AppData/Local/Temp/jetty-docbase.9011.1533347368098452577/, jar:file:/D:/data/.m2/org/webjars/swagger-ui/4.18.2/swagger-ui-4.18.2.jar!/META-INF/resources],STOPPED}
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.841 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -HikariPool-1 - Shutdown initiated...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.844 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -HikariPool-1 - Shutdown completed.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.847 [SpringApplicationShutdownHook] INFO  org.springframework.scheduling.quartz.SchedulerFactoryBean#?:? -Shutting down Quartz Scheduler
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.847 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service shutting down.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.847 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service paused.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.847 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service shutdown complete.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.848 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#close:350 -DatebookHikariCP - Shutdown initiated...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.848 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -DatebookHikariCP - Shutdown completed.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.848 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -HikariPool-2 - Shutdown initiated...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.849 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -HikariPool-2 - Shutdown completed.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.851 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -DatebookHikariCP - Shutdown initiated...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.851 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -DatebookHikariCP - Shutdown completed.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.851 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.PoolBase#?:? -DatebookHikariCP - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@6dd696e8 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:41.914 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -Shutting down DiscoveryClient ...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.918 [DiscoveryClient-InstanceInfoReplicator-0] WARN  org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator#?:? -DataSource health check failed
-org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
-	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:83)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:330)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.getProduct(DataSourceHealthIndicator.java:122)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doDataSourceHealthCheck(DataSourceHealthIndicator.java:105)
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:26:10.371 [DiscoveryClient-HeartbeatExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:26:40.453 [DiscoveryClient-HeartbeatExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:29:08.874 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#?:? -Resolving eureka endpoints via configuration
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:30:41.180 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#?:? -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:34:08.885 [AsyncResolver-bootstrap-executor-0] INFO  com.netflix.discovery.shared.resolver.aws.ConfigClusterResolver#?:? -Resolving eureka endpoints via configuration
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:34:41.952 [DiscoveryClient-HeartbeatExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#?:? -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:34:42.567 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#?:? -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.886 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool#run:804 -HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m12s193ms682µs700ns).
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.890 [DatebookHikariCP housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool#?:? -DatebookHikariCP - Thread starvation or clock leap detected (housekeeper delta=1m28s276ms697µs300ns).
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.893 [DatebookHikariCP housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool#run:804 -DatebookHikariCP - Thread starvation or clock leap detected (housekeeper delta=1m32s761ms1µs500ns).
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.895 [DiscoveryClient-CacheRefreshExecutor-0] INFO  org.apache.hc.client5.http.impl.classic.HttpRequestRetryExec#execute:113 -Recoverable I/O exception (org.apache.hc.core5.http.NoHttpResponseException) caught when processing request to {}->http://121.37.97.46:8761
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.899 [HikariPool-2 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool#?:? -HikariPool-2 - Thread starvation or clock leap detected (housekeeper delta=1m11s94ms9µs700ns).
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.890 [DiscoveryClient-0] WARN  com.netflix.discovery.TimedSupervisorTask#?:? -task supervisor timed out
+java.util.concurrent.TimeoutException: null
+	at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:204)
+	at com.netflix.discovery.TimedSupervisorTask.run(TimedSupervisorTask.java:68)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
+	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:51.907 [qtp915404990-32] WARN  org.eclipse.jetty.server.HttpChannel#?:? -/vm-service/goods/CardKeyExchange
+jakarta.servlet.ServletException: Request processing failed: java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because "days" is null
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1019)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:520)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:587)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:764)
+	at org.eclipse.jetty.servlet.ServletHandler$ChainEnd.doFilter(ServletHandler.java:1665)
+	at com.fit2cloud.filter.FilterConfig$loginInfoCheck.doFilter(FilterConfig.java:121)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:477)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:338)
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:80)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:126)
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at com.fit2cloud.security.filter.JwtTokenAuthFilter.doFilterInternal(JwtTokenAuthFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:227)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:221)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:238)
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:321)
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:222)
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:135)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:352)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:268)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.eclipse.jetty.websocket.servlet.WebSocketUpgradeFilter.doFilter(WebSocketUpgradeFilter.java:170)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:202)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1635)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:527)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:131)
+	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:578)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:223)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1570)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:221)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1381)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:176)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:484)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1543)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:174)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1303)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:129)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.handler.gzip.GzipHandler.handle(GzipHandler.java:822)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:122)
+	at org.eclipse.jetty.server.Server.handle(Server.java:563)
+	at org.eclipse.jetty.server.HttpChannel.lambda$handle$0(HttpChannel.java:505)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:762)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:497)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:282)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:314)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:100)
+	at org.eclipse.jetty.io.SelectableChannelEndPoint$1.run(SelectableChannelEndPoint.java:53)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.runTask(AdaptiveExecutionStrategy.java:416)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.consumeTask(AdaptiveExecutionStrategy.java:385)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.tryProduce(AdaptiveExecutionStrategy.java:272)
+	at org.eclipse.jetty.util.thread.strategy.AdaptiveExecutionStrategy.produce(AdaptiveExecutionStrategy.java:194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:969)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.doRunJob(QueuedThreadPool.java:1194)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1149)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: java.lang.NullPointerException: Cannot invoke "java.lang.Integer.intValue()" because "days" is null
+	at com.fit2cloud.service.impl.GoodsServiceImpl.writeoff(GoodsServiceImpl.java:296)
+	at com.fit2cloud.controller.GoodsController.CardKeyExchange(GoodsController.java:77)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:750)
+	at org.springframework.validation.beanvalidation.MethodValidationInterceptor.invoke(MethodValidationInterceptor.java:141)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:750)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:702)
+	at com.fit2cloud.controller.GoodsController$$SpringCGLIB$$0.CardKeyExchange(<generated>)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:207)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:152)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011)
+	... 135 common frames omitted
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.618 [SpringApplicationShutdownHook] INFO  org.springframework.cloud.netflix.eureka.serviceregistry.EurekaServiceRegistry#?:? -Unregistering application VM-SERVICE with eureka with status DOWN
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.618 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -Saw local status change event StatusChangeEvent [timestamp=1757227012618, current=DOWN, previous=UP]
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.628 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.Server#?:? -Stopped Server@7f006525{STOPPING}[11.0.15,sto=0]
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.639 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.AbstractConnector#?:? -Stopped ServerConnector@2839ac4c{HTTP/1.1, (http/1.1)}{0.0.0.0:9911}
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.642 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler.application#?:? -Destroying Spring FrameworkServlet 'dispatcherServletRegistration'
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.645 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler#?:? -Stopped o.s.b.w.e.j.JettyEmbeddedWebAppContext@4011f95e{application,/,[file:///C:/Users/Administrator/AppData/Local/Temp/jetty-docbase.9911.16531775172080974956/, jar:file:/D:/data/.m2/org/webjars/swagger-ui/4.18.2/swagger-ui-4.18.2.jar!/META-INF/resources],STOPPED}
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.654 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service paused.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.654 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.Server#?:? -Stopped Server@eee26bd{STOPPING}[11.0.15,sto=0]
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.656 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.AbstractConnector#?:? -Stopped ServerConnector@2123a61c{HTTP/1.1, (http/1.1)}{0.0.0.0:9011}
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.664 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler.application#?:? -Destroying Spring FrameworkServlet 'dispatcherServlet'
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.665 [SpringApplicationShutdownHook] INFO  org.eclipse.jetty.server.handler.ContextHandler#?:? -Stopped o.s.b.w.e.j.JettyEmbeddedWebAppContext@5183131d{application,/vm-service,[file:///C:/Users/Administrator/AppData/Local/Temp/jetty-docbase.9011.5405017196024139682/, jar:file:/D:/data/.m2/org/webjars/swagger-ui/4.18.2/swagger-ui-4.18.2.jar!/META-INF/resources],STOPPED}
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.739 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -HikariPool-1 - Shutdown initiated...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.783 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -HikariPool-1 - Shutdown completed.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.797 [SpringApplicationShutdownHook] INFO  org.springframework.scheduling.quartz.SchedulerFactoryBean#?:? -Shutting down Quartz Scheduler
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.797 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service shutting down.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.797 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service paused.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.798 [SpringApplicationShutdownHook] INFO  org.quartz.core.QuartzScheduler#?:? -Scheduler vm-service_$_vm-service shutdown complete.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.798 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -DatebookHikariCP - Shutdown initiated...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.801 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -DatebookHikariCP - Shutdown completed.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.809 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#close:350 -DatebookHikariCP - Shutdown initiated...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.831 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#?:? -DatebookHikariCP - Shutdown completed.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.860 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.zaxxer.hikari.pool.ProxyConnection#checkException:177 -DatebookHikariCP - Connection com.mysql.cj.jdbc.ConnectionImpl@623e578b marked as broken because of SQLSTATE(08S01), ErrorCode(0)
+com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 345 milliseconds ago. The last packet sent successfully to the server was 375 milliseconds ago.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:175)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64)
+	at com.mysql.cj.jdbc.StatementImpl.executeQuery(StatementImpl.java:1200)
+	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.executeQuery(HikariProxyStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate$1QueryStatementCallback.doInStatement(JdbcTemplate.java:452)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:381)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:465)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:475)
+	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doDataSourceHealthCheck(DataSourceHealthIndicator.java:110)
 	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doHealthCheck(DataSourceHealthIndicator.java:100)
 	at org.springframework.boot.actuate.health.AbstractHealthIndicator.health(AbstractHealthIndicator.java:82)
 	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.processContributor(EurekaHealthCheckHandler.java:162)
@@ -59,30 +235,63 @@ org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC
 	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:117)
 	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
 	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
 	at java.base/java.lang.Thread.run(Thread.java:842)
-Caused by: java.sql.SQLException: DatebookHikariCP - Interrupted during connection acquisition
-	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:185)
-	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:146)
-	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:128)
-	at org.springframework.jdbc.datasource.DataSourceUtils.fetchConnection(DataSourceUtils.java:159)
-	at org.springframework.jdbc.datasource.DataSourceUtils.doGetConnection(DataSourceUtils.java:117)
-	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:80)
-	... 19 common frames omitted
-Caused by: java.lang.InterruptedException: null
-	at java.base/java.util.concurrent.SynchronousQueue.poll(SynchronousQueue.java:906)
-	at com.zaxxer.hikari.util.ConcurrentBag.borrow(ConcurrentBag.java:151)
-	at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:164)
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 345 milliseconds ago. The last packet sent successfully to the server was 375 milliseconds ago.
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:62)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:105)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:150)
+	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:166)
+	at com.mysql.cj.protocol.a.NativeProtocol.readMessage(NativeProtocol.java:582)
+	at com.mysql.cj.protocol.a.NativeProtocol.checkErrorMessage(NativeProtocol.java:762)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendCommand(NativeProtocol.java:701)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendQueryPacket(NativeProtocol.java:1052)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendQueryString(NativeProtocol.java:998)
+	at com.mysql.cj.NativeSession.execSQL(NativeSession.java:655)
+	at com.mysql.cj.jdbc.StatementImpl.executeQuery(StatementImpl.java:1168)
 	... 24 common frames omitted
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.921 [DiscoveryClient-InstanceInfoReplicator-0] WARN  org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator#?:? -DataSource health check failed
-org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
-	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:83)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:330)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.getProduct(DataSourceHealthIndicator.java:122)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doDataSourceHealthCheck(DataSourceHealthIndicator.java:105)
+Caused by: java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endRead(NioSocketImpl.java:253)
+	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:332)
+	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:355)
+	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:808)
+	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:966)
+	at com.mysql.cj.protocol.ReadAheadInputStream.fill(ReadAheadInputStream.java:107)
+	at com.mysql.cj.protocol.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:150)
+	at com.mysql.cj.protocol.ReadAheadInputStream.read(ReadAheadInputStream.java:180)
+	at java.base/java.io.FilterInputStream.read(FilterInputStream.java:132)
+	at com.mysql.cj.protocol.FullReadInputStream.readFully(FullReadInputStream.java:64)
+	at com.mysql.cj.protocol.a.SimplePacketReader.readHeaderLocal(SimplePacketReader.java:81)
+	at com.mysql.cj.protocol.a.SimplePacketReader.readHeader(SimplePacketReader.java:63)
+	at com.mysql.cj.protocol.a.SimplePacketReader.readHeader(SimplePacketReader.java:45)
+	at com.mysql.cj.protocol.a.TimeTrackingPacketReader.readHeader(TimeTrackingPacketReader.java:52)
+	at com.mysql.cj.protocol.a.TimeTrackingPacketReader.readHeader(TimeTrackingPacketReader.java:41)
+	at com.mysql.cj.protocol.a.MultiPacketReader.readHeader(MultiPacketReader.java:54)
+	at com.mysql.cj.protocol.a.MultiPacketReader.readHeader(MultiPacketReader.java:44)
+	at com.mysql.cj.protocol.a.NativeProtocol.readMessage(NativeProtocol.java:576)
+	... 30 common frames omitted
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:52.984 [DiscoveryClient-InstanceInfoReplicator-0] WARN  org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator#logExceptionIfPresent:94 -DataSource health check failed
+org.springframework.dao.RecoverableDataAccessException: StatementCallback; SQL [SELECT 1]; Communications link failure
+
+The last packet successfully received from the server was 345 milliseconds ago. The last packet sent successfully to the server was 375 milliseconds ago.
+	at org.springframework.jdbc.support.SQLExceptionSubclassTranslator.doTranslate(SQLExceptionSubclassTranslator.java:108)
+	at org.springframework.jdbc.support.AbstractFallbackSQLExceptionTranslator.translate(AbstractFallbackSQLExceptionTranslator.java:70)
+	at org.springframework.jdbc.core.JdbcTemplate.translateException(JdbcTemplate.java:1538)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:393)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:465)
+	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:475)
+	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doDataSourceHealthCheck(DataSourceHealthIndicator.java:110)
 	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doHealthCheck(DataSourceHealthIndicator.java:100)
 	at org.springframework.boot.actuate.health.AbstractHealthIndicator.health(AbstractHealthIndicator.java:82)
 	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.processContributor(EurekaHealthCheckHandler.java:162)
@@ -94,92 +303,139 @@ org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC
 	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:117)
 	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
 	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
 	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
 	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
 	at java.base/java.lang.Thread.run(Thread.java:842)
-Caused by: java.sql.SQLException: HikariDataSource HikariDataSource (DatebookHikariCP) has been closed.
-	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:96)
-	at org.springframework.jdbc.datasource.DataSourceUtils.fetchConnection(DataSourceUtils.java:159)
-	at org.springframework.jdbc.datasource.DataSourceUtils.doGetConnection(DataSourceUtils.java:117)
-	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:80)
-	... 19 common frames omitted
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.922 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#unregister:915 -Unregistering ...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.922 [DiscoveryClient-InstanceInfoReplicator-0] WARN  org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator#?:? -DataSource health check failed
-org.springframework.jdbc.CannotGetJdbcConnectionException: Failed to obtain JDBC Connection
-	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:83)
-	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:330)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.getProduct(DataSourceHealthIndicator.java:122)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doDataSourceHealthCheck(DataSourceHealthIndicator.java:105)
-	at org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator.doHealthCheck(DataSourceHealthIndicator.java:100)
-	at org.springframework.boot.actuate.health.AbstractHealthIndicator.health(AbstractHealthIndicator.java:82)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.processContributor(EurekaHealthCheckHandler.java:162)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.processContributor(EurekaHealthCheckHandler.java:158)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getStatus(EurekaHealthCheckHandler.java:147)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getHealthStatus(EurekaHealthCheckHandler.java:140)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getStatus(EurekaHealthCheckHandler.java:129)
-	at com.netflix.discovery.DiscoveryClient.refreshInstanceInfo(DiscoveryClient.java:1384)
-	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:117)
-	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
-	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
-	at java.base/java.lang.Thread.run(Thread.java:842)
-Caused by: java.sql.SQLException: HikariDataSource HikariDataSource (HikariPool-2) has been closed.
-	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:96)
-	at org.springframework.jdbc.datasource.DataSourceUtils.fetchConnection(DataSourceUtils.java:159)
-	at org.springframework.jdbc.datasource.DataSourceUtils.doGetConnection(DataSourceUtils.java:117)
-	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:80)
-	... 19 common frames omitted
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.934 [DiscoveryClient-InstanceInfoReplicator-0] WARN  org.springframework.cloud.health.RefreshScopeHealthIndicator#?:? -Health check failed
-org.springframework.beans.factory.BeanCreationNotAllowedException: Error creating bean with name 'refreshScope': Singleton bean creation not allowed while singletons of this factory are in destruction (Do not request a bean from a BeanFactory in a destroy method implementation!)
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:220)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324)
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200)
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1417)
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory$DependencyObjectProvider.getIfAvailable(DefaultListableBeanFactory.java:2056)
-	at org.springframework.cloud.health.RefreshScopeHealthIndicator.doHealthCheck(RefreshScopeHealthIndicator.java:48)
-	at org.springframework.boot.actuate.health.AbstractHealthIndicator.health(AbstractHealthIndicator.java:82)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.processContributor(EurekaHealthCheckHandler.java:162)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getStatus(EurekaHealthCheckHandler.java:147)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getHealthStatus(EurekaHealthCheckHandler.java:140)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getStatus(EurekaHealthCheckHandler.java:129)
-	at com.netflix.discovery.DiscoveryClient.refreshInstanceInfo(DiscoveryClient.java:1384)
-	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:117)
-	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
-	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
-	at java.base/java.lang.Thread.run(Thread.java:842)
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.940 [DiscoveryClient-InstanceInfoReplicator-0] WARN  com.netflix.discovery.DiscoveryClient#?:? -Exception from healthcheckHandler.getStatus, setting status to DOWN
-reactor.core.Exceptions$ReactiveException: java.lang.InterruptedException
-	at reactor.core.Exceptions.propagate(Exceptions.java:408)
-	at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:91)
-	at reactor.core.publisher.Mono.block(Mono.java:1710)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.processContributor(EurekaHealthCheckHandler.java:173)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getStatus(EurekaHealthCheckHandler.java:150)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getHealthStatus(EurekaHealthCheckHandler.java:140)
-	at org.springframework.cloud.netflix.eureka.EurekaHealthCheckHandler.getStatus(EurekaHealthCheckHandler.java:129)
-	at com.netflix.discovery.DiscoveryClient.refreshInstanceInfo(DiscoveryClient.java:1384)
-	at com.netflix.discovery.InstanceInfoReplicator.run(InstanceInfoReplicator.java:117)
-	at com.netflix.discovery.InstanceInfoReplicator$1.run(InstanceInfoReplicator.java:101)
-	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
-	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
-	at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
-	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
-	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
-	at java.base/java.lang.Thread.run(Thread.java:842)
-Caused by: java.lang.InterruptedException: null
-	at java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(AbstractQueuedSynchronizer.java:1048)
-	at java.base/java.util.concurrent.CountDownLatch.await(CountDownLatch.java:230)
-	at reactor.core.publisher.BlockingSingleSubscriber.blockingGet(BlockingSingleSubscriber.java:87)
-	... 14 common frames omitted
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.940 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient#register:817 -DiscoveryClient_VM-SERVICE/M444444A1:vm-service:9011: registering service...
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.959 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -DiscoveryClient_VM-SERVICE/M444444A1:vm-service:9011 - deregister  status: 200
-[12540] [application.name_IS_UNDEFINED] 2025-07-29 22:12:44.963 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -Completed shut down of DiscoveryClient
+Caused by: com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 345 milliseconds ago. The last packet sent successfully to the server was 375 milliseconds ago.
+	at com.mysql.cj.jdbc.exceptions.SQLError.createCommunicationsException(SQLError.java:175)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:64)
+	at com.mysql.cj.jdbc.StatementImpl.executeQuery(StatementImpl.java:1200)
+	at com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.executeQuery(HikariProxyStatement.java)
+	at org.springframework.jdbc.core.JdbcTemplate$1QueryStatementCallback.doInStatement(JdbcTemplate.java:452)
+	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:381)
+	... 20 common frames omitted
+Caused by: com.mysql.cj.exceptions.CJCommunicationsException: Communications link failure
+
+The last packet successfully received from the server was 345 milliseconds ago. The last packet sent successfully to the server was 375 milliseconds ago.
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499)
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:62)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:105)
+	at com.mysql.cj.exceptions.ExceptionFactory.createException(ExceptionFactory.java:150)
+	at com.mysql.cj.exceptions.ExceptionFactory.createCommunicationsException(ExceptionFactory.java:166)
+	at com.mysql.cj.protocol.a.NativeProtocol.readMessage(NativeProtocol.java:582)
+	at com.mysql.cj.protocol.a.NativeProtocol.checkErrorMessage(NativeProtocol.java:762)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendCommand(NativeProtocol.java:701)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendQueryPacket(NativeProtocol.java:1052)
+	at com.mysql.cj.protocol.a.NativeProtocol.sendQueryString(NativeProtocol.java:998)
+	at com.mysql.cj.NativeSession.execSQL(NativeSession.java:655)
+	at com.mysql.cj.jdbc.StatementImpl.executeQuery(StatementImpl.java:1168)
+	... 24 common frames omitted
+Caused by: java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.endRead(NioSocketImpl.java:253)
+	at java.base/sun.nio.ch.NioSocketImpl.implRead(NioSocketImpl.java:332)
+	at java.base/sun.nio.ch.NioSocketImpl.read(NioSocketImpl.java:355)
+	at java.base/sun.nio.ch.NioSocketImpl$1.read(NioSocketImpl.java:808)
+	at java.base/java.net.Socket$SocketInputStream.read(Socket.java:966)
+	at com.mysql.cj.protocol.ReadAheadInputStream.fill(ReadAheadInputStream.java:107)
+	at com.mysql.cj.protocol.ReadAheadInputStream.readFromUnderlyingStreamIfNecessary(ReadAheadInputStream.java:150)
+	at com.mysql.cj.protocol.ReadAheadInputStream.read(ReadAheadInputStream.java:180)
+	at java.base/java.io.FilterInputStream.read(FilterInputStream.java:132)
+	at com.mysql.cj.protocol.FullReadInputStream.readFully(FullReadInputStream.java:64)
+	at com.mysql.cj.protocol.a.SimplePacketReader.readHeaderLocal(SimplePacketReader.java:81)
+	at com.mysql.cj.protocol.a.SimplePacketReader.readHeader(SimplePacketReader.java:63)
+	at com.mysql.cj.protocol.a.SimplePacketReader.readHeader(SimplePacketReader.java:45)
+	at com.mysql.cj.protocol.a.TimeTrackingPacketReader.readHeader(TimeTrackingPacketReader.java:52)
+	at com.mysql.cj.protocol.a.TimeTrackingPacketReader.readHeader(TimeTrackingPacketReader.java:41)
+	at com.mysql.cj.protocol.a.MultiPacketReader.readHeader(MultiPacketReader.java:54)
+	at com.mysql.cj.protocol.a.MultiPacketReader.readHeader(MultiPacketReader.java:44)
+	at com.mysql.cj.protocol.a.NativeProtocol.readMessage(NativeProtocol.java:576)
+	... 30 common frames omitted
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.080 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#close:350 -HikariPool-2 - Shutdown initiated...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.158 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource#close:352 -HikariPool-2 - Shutdown completed.
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.164 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -Shutting down DiscoveryClient ...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.191 [boundedElastic-2] WARN  org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator#logExceptionIfPresent:92 -Redis health check failed
+org.springframework.data.redis.RedisSystemException: Redisson is shutdown
+	at org.redisson.spring.data.connection.RedissonBaseReactive.lambda$read$5(RedissonBaseReactive.java:91)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Assembly trace from producer [reactor.core.publisher.MonoError] :
+
+Error has been observed at the following site(s):
+	*__Mono.onErrorMap ⇢ at org.redisson.spring.data.connection.RedissonBaseReactive.read(RedissonBaseReactive.java:91)
+	|_        Mono.map ⇢ at org.springframework.boot.actuate.data.redis.RedisReactiveHealthIndicator.getHealth(RedisReactiveHealthIndicator.java:69)
+Original Stack Trace:
+		at org.redisson.spring.data.connection.RedissonBaseReactive.lambda$read$5(RedissonBaseReactive.java:91)
+		at reactor.core.publisher.Mono.lambda$onErrorMap$28(Mono.java:3773)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:94)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.FluxCreate$BaseSink.error(FluxCreate.java:474)
+		at reactor.core.publisher.FluxCreate$BufferAsyncSink.drain(FluxCreate.java:802)
+		at reactor.core.publisher.FluxCreate$BufferAsyncSink.error(FluxCreate.java:747)
+		at reactor.core.publisher.FluxCreate$SerializedFluxSink.drainLoop(FluxCreate.java:237)
+		at reactor.core.publisher.FluxCreate$SerializedFluxSink.drain(FluxCreate.java:213)
+		at reactor.core.publisher.FluxCreate$SerializedFluxSink.error(FluxCreate.java:189)
+		at org.redisson.reactive.CommandReactiveService.lambda$reactive$1(CommandReactiveService.java:60)
+		at java.base/java.util.concurrent.CompletableFuture.uniWhenComplete(CompletableFuture.java:863)
+		at java.base/java.util.concurrent.CompletableFuture.uniWhenCompleteStage(CompletableFuture.java:887)
+		at java.base/java.util.concurrent.CompletableFuture.whenComplete(CompletableFuture.java:2325)
+		at org.redisson.misc.CompletableFutureWrapper.whenComplete(CompletableFutureWrapper.java:223)
+		at org.redisson.reactive.CommandReactiveService.lambda$reactive$2(CommandReactiveService.java:55)
+		at reactor.core.publisher.FluxCreate$BaseSink.onRequest(FluxCreate.java:557)
+		at reactor.core.publisher.FluxCreate$SerializedFluxSink.onRequest(FluxCreate.java:271)
+		at org.redisson.reactive.CommandReactiveService.lambda$reactive$3(CommandReactiveService.java:42)
+		at reactor.core.publisher.FluxCreate.subscribe(FluxCreate.java:95)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:165)
+		at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:251)
+		at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+		at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+		at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
+		at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.redisson.RedissonShutdownException: Redisson is shutdown
+	at org.redisson.command.RedisExecutor.execute(RedisExecutor.java:122)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Assembly trace from producer [reactor.core.publisher.FluxCreate] :
+	reactor.core.publisher.Flux.create(Flux.java:646)
+	org.redisson.reactive.CommandReactiveService.reactive(CommandReactiveService.java:41)
+Error has been observed at the following site(s):
+	*__Flux.create ⇢ at org.redisson.reactive.CommandReactiveService.reactive(CommandReactiveService.java:41)
+	|_   Flux.next ⇢ at org.redisson.reactive.CommandReactiveService.reactive(CommandReactiveService.java:70)
+Original Stack Trace:
+		at org.redisson.command.RedisExecutor.execute(RedisExecutor.java:122)
+		at org.redisson.command.CommandAsyncService.async(CommandAsyncService.java:535)
+		at org.redisson.command.CommandAsyncService.readAsync(CommandAsyncService.java:321)
+		at org.redisson.spring.data.connection.RedissonBaseReactive.lambda$read$4(RedissonBaseReactive.java:89)
+		at org.redisson.reactive.CommandReactiveService.lambda$reactive$2(CommandReactiveService.java:45)
+		at reactor.core.publisher.FluxCreate$BaseSink.onRequest(FluxCreate.java:557)
+		at reactor.core.publisher.FluxCreate$SerializedFluxSink.onRequest(FluxCreate.java:271)
+		at org.redisson.reactive.CommandReactiveService.lambda$reactive$3(CommandReactiveService.java:42)
+		at reactor.core.publisher.FluxCreate.subscribe(FluxCreate.java:95)
+		at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:64)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.onNext(MonoFlatMap.java:165)
+		at reactor.core.publisher.FluxSubscribeOnCallable$CallableSubscribeOnSubscription.run(FluxSubscribeOnCallable.java:251)
+		at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:68)
+		at reactor.core.scheduler.SchedulerTask.call(SchedulerTask.java:28)
+		at java.base/java.util.concurrent.FutureTask.run$$$capture(FutureTask.java:264)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java)
+		at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:304)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.202 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient#register:817 -DiscoveryClient_VM-SERVICE/AK444447:vm-service:9011: registering service...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.265 [DiscoveryClient-InstanceInfoReplicator-0] INFO  com.netflix.discovery.DiscoveryClient#?:? -DiscoveryClient_VM-SERVICE/AK444447:vm-service:9011 - registration status: 204
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.270 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -Unregistering ...
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.310 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#?:? -DiscoveryClient_VM-SERVICE/AK444447:vm-service:9011 - deregister  status: 200
+[7404] [application.name_IS_UNDEFINED] 2025-09-07 14:36:53.324 [SpringApplicationShutdownHook] INFO  com.netflix.discovery.DiscoveryClient#shutdown:904 -Completed shut down of DiscoveryClient

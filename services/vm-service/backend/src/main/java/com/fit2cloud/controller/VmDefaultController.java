@@ -77,7 +77,7 @@ public class VmDefaultController {
     @GetMapping("/infoList")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<IPage<LiveUser>> infoList(@ModelAttribute CreateServerRequest request) {
-        return ResultHolder.message(200,"ok",iVmDefaultService.getInfoList(request));
+        return ResultHolder.of(200,"ok",iVmDefaultService.getInfoList(request));
     }
 
 }

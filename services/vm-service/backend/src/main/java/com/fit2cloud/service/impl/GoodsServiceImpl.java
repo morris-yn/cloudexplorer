@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,27 +52,75 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Override
     public List<LiveGoods> getList(LiveGoods goods) {
+        if (goods.getCatId() == 49 || goods.getCatId() == 45) {
+            LiveGoods res = new LiveGoods();
+            res.setCatId(9999);
+            res.setGoodsId(99999);
+            if (goods.getCatId() == 45) {
+                res.setGoodsId(99998);
+            }
+            res.setGoodsSn("gm9999");
+            res.setMarketPrice(0);
+            res.setShopPrice(0);
+            res.setGoodsBrief("8640");
+            List<LiveGoods> resl = new ArrayList<>();
+            resl.add(res);
+            return resl;
+        }
         QueryWrapper<LiveGoods> wrapper = new QueryWrapper<>();
         wrapper.eq("is_on_sale", 1L)
-                .eq("cat_id",goods.getCatId());
+                .eq("cat_id", goods.getCatId());
         return liveGoodsMapper.selectList(wrapper);
     }
 
     @Override
-    public Map<String,Object> getNativeQR(GoodsToCart goods) throws Exception {
+    public Map<String, Object> getNativeQR(GoodsToCart goods) throws Exception {
         //判断是否只可购买一次
+        Map<String, Object> result = new HashMap();
+        String userid = liveGoodsMapper.selectUserId(UserContext.getToken());
+        UserValidtime userValidtime = vmDefaultConfigMapper.selectUserValidtime(userid);
+        if (goods.getGoodsId() == 6499 && userValidtime.getFirst()) {
+            result.put("code", 501);
+            result.put("msg", "已购买过一次,不可重复购买");
+            return result;
+        }
 
-
+        if (goods.getGoodsId() == 99999 || goods.getGoodsId() == 99998) {
+            if (goods.getGoodsId() == 99999) {
+                if (userValidtime.getVaildTime().isAfter(LocalDateTime.now())) {
+                    LocalDateTime time = userValidtime.getVaildTime().plusHours(8640);
+                    userValidtime.setServerAVt(time);
+                    userValidtimeMapper.updateById(userValidtime);
+                } else {
+                    LocalDateTime time = LocalDateTime.now().plusHours(8640);
+                    userValidtime.setServerAVt(time);
+                    userValidtimeMapper.updateById(userValidtime);
+                }
+            } else {
+                if (userValidtime.getVaildTime().isAfter(LocalDateTime.now())) {
+                    LocalDateTime time = userValidtime.getVaildTime().plusHours(8640);
+                    userValidtime.setServerBVt(time);
+                    userValidtimeMapper.updateById(userValidtime);
+                } else {
+                    LocalDateTime time = LocalDateTime.now().plusHours(8640);
+                    userValidtime.setServerBVt(time);
+                    userValidtimeMapper.updateById(userValidtime);
+                }
+            }
+            result.put("code", 200);
+            result.put("msg", "购买成功");
+            return result;
+        }
         //
 //        OkHttpClient client = new OkHttpClient();
-        if("".equals(sessionId)){
+        if ("".equals(sessionId)) {
             RequestBody req = new FormBody.Builder()
-                .add("username", "ceshia")
-                .add("password", "ceshia")
-                .add("act", "act_login")
-                .add("back_act", "https://shop.livepartner.fans/index.php")
-                .add("submit", "登 录")
-                .build();
+                    .add("username", "ceshia")
+                    .add("password", "ceshia")
+                    .add("act", "act_login")
+                    .add("back_act", "https://shop.livepartner.fans/index.php")
+                    .add("submit", "登 录")
+                    .build();
 
             Request request = new Request.Builder()
                     .url("https://shop.livepartner.fans/user.php")
@@ -80,8 +129,8 @@ public class GoodsServiceImpl implements IGoodsService {
             Response response = null;
             try {
                 response = client.newCall(request).execute();
-                for(String item : response.headers("set-cookie")){
-                    if(item.indexOf("ECS_ID") > -1){
+                for (String item : response.headers("set-cookie")) {
+                    if (item.indexOf("ECS_ID") > -1) {
                         this.sessionId = item;
                         break;
                     }
@@ -124,14 +173,14 @@ public class GoodsServiceImpl implements IGoodsService {
                 .add("x", "43")
                 .add("y", "22")
                 .add("step", "done")
-                .add("postscript","购买用户id:"+ liveGoodsMapper.selectUserId(UserContext.getToken()))
+                .add("postscript", "购买用户id:" + liveGoodsMapper.selectUserId(UserContext.getToken()))
                 .build();
 
         // 构造请求
         request = new Request.Builder()
                 .url("https://shop.livepartner.fans/flow.php?step=done")
                 .post(formBody)
-                .addHeader("Cookie", sessionId+"; ECS[visit_times]=1")
+                .addHeader("Cookie", sessionId + "; ECS[visit_times]=1")
                 .addHeader("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
                 .addHeader("Accept", "*/*")
                 .addHeader("Host", "shop.livepartner.fans")
@@ -168,14 +217,12 @@ public class GoodsServiceImpl implements IGoodsService {
         } catch (Exception e) {
             throw e;
         }
-
-        Map<String,Object> result = new HashMap<>();
-        result.put("QRcode",qrcode);
-        result.put("orderId",orderId);
+        result.put("QRcode", qrcode);
+        result.put("orderId", orderId);
         String payLogId = liveGoodsMapper.getPayLogId(orderId);
-        result.put("payLogId",payLogId);
-        result.put("retired",5);
-        LogUtils.setLog(LogContants.ORDER.getCode(),JSONObject.toJSONString(result));
+        result.put("payLogId", payLogId);
+        result.put("retired", 5);
+        LogUtils.setLog(LogContants.ORDER.getCode(), JSONObject.toJSONString(result));
         return result;
     }
 
@@ -184,7 +231,7 @@ public class GoodsServiceImpl implements IGoodsService {
         PayStatus payStatus = liveGoodsMapper.selectPayStatus(confrimPayment.getOrderId());
         Integer payLogStatus = null;
         Request request = new Request.Builder()
-                .url("https://shop.livepartner.fans//respond.php?code=wxpaynative&check=true&log_id="+confrimPayment.getLogId())
+                .url("https://shop.livepartner.fans//respond.php?code=wxpaynative&check=true&log_id=" + confrimPayment.getLogId())
                 .addHeader("Cookie", sessionId)
                 .get()
                 .build();
@@ -200,17 +247,17 @@ public class GoodsServiceImpl implements IGoodsService {
         }
 
 
-        if(payLogStatus != 0){
+        if (payLogStatus != 0) {
             return false;
         }
 
         String userid = liveGoodsMapper.selectUserId(UserContext.getToken());
         UserValidtime userValidtime = vmDefaultConfigMapper.selectUserValidtime(userid);
-        if(userValidtime.getVaildTime().isAfter(LocalDateTime.now())){
+        if (userValidtime.getVaildTime().isAfter(LocalDateTime.now())) {
             LocalDateTime time = userValidtime.getVaildTime().plusHours(Integer.parseInt(payStatus.getGoodsBrief()));
             userValidtime.setVaildTime(time);
             userValidtimeMapper.updateById(userValidtime);
-        }else{
+        } else {
             LocalDateTime time = LocalDateTime.now().plusHours(Integer.parseInt(payStatus.getGoodsBrief()));
             userValidtime.setVaildTime(time);
             userValidtimeMapper.updateById(userValidtime);
@@ -219,18 +266,18 @@ public class GoodsServiceImpl implements IGoodsService {
     }
 
     @Override
-    public LocalDateTime getVaildTimeByToken(String token) {
-        QueryWrapper wrapper = new QueryWrapper<UserValidtime>().eq("user_id",liveGoodsMapper.selectUserId(UserContext.getToken()));
-        UserValidtime userValidtime= userValidtimeMapper.selectOne(wrapper);
-        return  userValidtime == null ?  LocalDateTime.now() :userValidtime.getVaildTime();
+    public Long getVaildTimeByToken(String token) {
+        QueryWrapper wrapper = new QueryWrapper<UserValidtime>().eq("user_id", liveGoodsMapper.selectUserId(UserContext.getToken()));
+        UserValidtime userValidtime = userValidtimeMapper.selectOne(wrapper);
+        return userValidtime == null ? LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond() : userValidtime.getVaildTime().atZone(ZoneId.systemDefault()).toInstant().getEpochSecond();
     }
 
     @Override
     public Map<String, String> writeoff(CDcard card) {
-        Map<String,String> result = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
         OkHttpClient client = new OkHttpClient();
         RequestBody req = new FormBody.Builder()
-                .add("card_sn",card.getCard())
+                .add("card_sn", card.getCard())
                 .add("card_password", card.getKey())
                 .build();
         Request okRequest = new Request.Builder()
@@ -245,8 +292,27 @@ public class GoodsServiceImpl implements IGoodsService {
             okResponse = client.newCall(okRequest).execute();
             resStr = okResponse.body().string();
             JSONObject resJo = JSONObject.parseObject(resStr);
-            result.put("code",resJo.getString("ret"));
-            result.put("msg",resJo.getString("msg"));
+            if(resJo.getInteger("ret") == 400){
+                result.put("code", resJo.getString("ret"));
+                result.put("msg", resJo.getString("msg"));
+                return result;
+            }
+            Integer days = resJo.getJSONObject("data").getInteger("days");
+            Integer hours = days * 24;
+            String userid = liveGoodsMapper.selectUserId(UserContext.getToken());
+            UserValidtime userValidtime = vmDefaultConfigMapper.selectUserValidtime(userid);
+            if (userValidtime.getVaildTime().isAfter(LocalDateTime.now())) {
+                LocalDateTime time = userValidtime.getVaildTime().plusHours(hours);
+                userValidtime.setVaildTime(time);
+                userValidtimeMapper.updateById(userValidtime);
+            } else {
+                LocalDateTime time = LocalDateTime.now().plusHours(hours);
+                userValidtime.setVaildTime(time);
+                userValidtimeMapper.updateById(userValidtime);
+            }
+            result.put("code", resJo.getString("ret"));
+            result.put("msg", "兑换成功");
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
