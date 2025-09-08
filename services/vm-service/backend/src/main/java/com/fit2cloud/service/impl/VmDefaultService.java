@@ -49,6 +49,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -354,15 +355,17 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             return result;
         }
         result.put("play_side_ip",currentUserInfo.getString("remoteIp"));
-        result.put("play_side_create_time",onlineConnectList.getIfPresent(uid));
+        result.put("play_side_create_time",onlineConnectList.getIfPresent(uid).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         result.put("play_side_area",currentUserInfo.getString("location"));
         result.put("play_side_operator",currentUserInfo.getString("netOperator"));
         VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(uid);
-        result.put("server_connect_time",onlineConnectList.getIfPresent(uid));
+        result.put("server_connect_time",onlineConnectList.getIfPresent(uid).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         result.put("server_area","杭州");
         result.put("server_ip","121.37.97.46");
-        result.put("live_ip",vmCloudServer.getRegion());
-        result.put("live_area",vmCloudServer.getRemoteIp());
+        result.put("live_ip",vmCloudServer.getRemoteIp());
+        result.put("live_area",vmCloudServer.getRegion());
+        result.put("live_ping","10ms");
+        result.put("live_time",3600);
         return result;
     }
 

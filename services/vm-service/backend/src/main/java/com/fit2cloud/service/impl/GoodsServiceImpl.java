@@ -60,6 +60,7 @@ public class GoodsServiceImpl implements IGoodsService {
                 res.setGoodsId(99998);
             }
             res.setGoodsSn("gm9999");
+            res.setGoodsName("一年-免费");
             res.setMarketPrice(0);
             res.setShopPrice(0);
             res.setGoodsBrief("8640");
