@@ -406,7 +406,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         SecretKeySpec secretKey = new SecretKeySpec(secretSalt.getBytes(), "AES");
         try {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(info));
+            byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(info.replace(" ", "+")));
             String decrypInfo = new String(decrypted);
             String[] infos = decrypInfo.split("&");
             if(!LocalDateTime.parse(infos[1]).isAfter(LocalDateTime.now())){
@@ -415,6 +415,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             }
             vmUserMapper.createSubUser(mainUid,infos[0]);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             result.put("code",415);
             result.put("msg","信息传递异常,请刷新二维码重试");
         }
