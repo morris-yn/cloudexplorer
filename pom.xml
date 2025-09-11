@@ -20,7 +20,8 @@
 
     <properties>
         <!-- ce 基本配置变量 start -->
-        <ce.base.dir>/opt/cloudexplorer</ce.base.dir>
+        <ce.base.dir>/data/opt/cloudexplorer</ce.base.dir>
+<!--        <ce.base.dir>/opt/cloudexplorer</ce.base.dir>-->
         <ce.config.dir>${ce.base.dir}/conf</ce.config.dir>
         <ce.config.file>${ce.config.dir}/cloudexplorer.properties</ce.config.file>
         <ce.log.base.dir>${ce.base.dir}/logs</ce.log.base.dir>

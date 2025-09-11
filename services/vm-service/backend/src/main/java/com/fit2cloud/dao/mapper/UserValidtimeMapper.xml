@@ -14,14 +14,14 @@
     </select>
 
     <select id="selectAllVmCloudServerByUserId" resultType="com.alibaba.fastjson2.JSONObject">
-        select sub.sub_user_id as uid,s.instance_name, s.remote_ip,s.region
+        select s.id,sub.sub_user_id as uid,s.instance_name, s.remote_ip,s.region,s.instance_status as status
         from user_sub sub
                  left join vm_user vm on vm.user_id = sub.sub_user_id
                  left join vm_cloud_server s on s.id = vm.vm_server_id
         where sub.user_id = #{userId}
         union
 
-        select vm.user_id as uid,s.instance_name,s.remote_ip,s.region
+        select s.id,vm.user_id as uid,s.instance_name,s.remote_ip,s.region,s.instance_status as status
         from vm_user vm
                  left join vm_cloud_server s on s.id = vm.vm_server_id
         where vm.user_id = #{userId}

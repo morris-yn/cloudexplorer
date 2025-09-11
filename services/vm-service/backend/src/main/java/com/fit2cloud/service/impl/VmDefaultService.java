@@ -7,23 +7,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fit2cloud.base.entity.User;
-import com.fit2cloud.base.entity.VmCloudDisk;
 import com.fit2cloud.base.entity.VmCloudServer;
-import com.fit2cloud.base.mapper.BaseVmCloudDiskMapper;
 import com.fit2cloud.common.utils.ColumnNameUtil;
 import com.fit2cloud.common.utils.PageUtil;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
-import com.fit2cloud.dao.entity.DefaultVmConfig;
-import com.fit2cloud.dao.entity.LiveUser;
-import com.fit2cloud.dao.entity.UserValidtime;
-import com.fit2cloud.dao.entity.VmUser;
+import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
 import com.fit2cloud.dao.mapper.UserValidtimeMapper;
 import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
 import com.fit2cloud.dao.mapper.VmUserMapper;
 import com.fit2cloud.dto.JobRecordDTO;
-import com.fit2cloud.dto.VmCloudDiskDTO;
 import com.fit2cloud.service.IVmCloudServerService;
 import com.fit2cloud.service.IVmDefaultService;
 import com.fit2cloud.utils.UserContext;
@@ -32,7 +25,6 @@ import com.google.common.cache.CacheBuilder;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import okhttp3.*;
-import org.joda.time.LocalTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -44,10 +36,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.AlgorithmParameters;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -129,6 +118,28 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 userValidtime.setUserId(id);
                 userValidtime.setUserName(user.getString("user_name"));
                 validtimeMapper.insert(userValidtime);
+                RequestBody req = new FormBody.Builder()
+                        .add("confirmPassword","Yy@111111")
+                        .add("email","@user")
+                        .add("name",user.getString("user_name"))
+                        .add("password","Yy@111111")
+                        .add("source","local")
+                        .add("username",user.getString("user_name"))
+                        .build();
+                Request okrequest = new Request.Builder()
+                        .url("http://localhost:9010/management-center/api/user/add")
+                        .post(req)
+                        .build();
+                Response response = null;
+                JSONArray newRows = new JSONArray();
+                try {
+                    response = client.newCall(okrequest).execute();
+                    String resStr = response.body().string();
+                    JSONObject resJo = JSONObject.parseObject(resStr);
+                }catch (Exception e){
+                    System.out.println("创建账号失败");
+                    return false;
+                }
             }
         }
         //String ipCurrent = this.toIPv4(request.getRemoteHost());
@@ -342,7 +353,13 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
 
     @Override
     public JSONArray getEquipmentList() {
-        return validtimeMapper.selectAllVmCloudServerByUserId(liveGoodsMapper.selectUserId(UserContext.getToken()));
+        JSONArray list = validtimeMapper.selectAllVmCloudServerByUserId(liveGoodsMapper.selectUserId(UserContext.getToken()));
+        for(Object item : list){
+            JSONObject jitem = (JSONObject) item;
+            jitem.put("instance_name",jitem.getString("id").substring(0,4).toUpperCase());
+            jitem.put("status", this.toF2CStatus(jitem.getString("status")));
+        }
+        return list;
     }
 
     @Override
@@ -412,6 +429,24 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             if(!LocalDateTime.parse(infos[1]).isAfter(LocalDateTime.now())){
                 result.put("code",416);
                 result.put("msg","二维码过期！");
+                return result;
+            }
+            if(mainUid.equals(infos[0])){
+                result.put("code",417);
+                result.put("msg","不能添加自己为子账号！");
+                return result;
+            }
+
+            if(vmUserMapper.querySubUserCondition(mainUid,infos[0]) > 0){
+                result.put("code",418);
+                result.put("msg","不可重复绑定！");
+                return result;
+            }
+
+            if(vmUserMapper.queryUserCondition(infos[0]) > 0){
+                result.put("code",419);
+                result.put("msg","不可添加主账号为子账号！");
+                return result;
             }
             vmUserMapper.createSubUser(mainUid,infos[0]);
         } catch (Exception e) {
@@ -456,5 +491,19 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         } catch (UnknownHostException e) {
             return ip; // 解析失败就返回原始值
         }
+    }
+
+    private String toF2CStatus(String status) {
+        String result = "异常";
+        switch (status) {
+            case "Running":
+                result = "运行中";
+                break;
+            case "Stopped":
+                result = "已停止";
+                break;
+        }
+
+        return result;
     }
 }
