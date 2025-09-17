@@ -118,28 +118,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 userValidtime.setUserId(id);
                 userValidtime.setUserName(user.getString("user_name"));
                 validtimeMapper.insert(userValidtime);
-                RequestBody req = new FormBody.Builder()
-                        .add("confirmPassword","Yy@111111")
-                        .add("email","@user")
-                        .add("name",user.getString("user_name"))
-                        .add("password","Yy@111111")
-                        .add("source","local")
-                        .add("username",user.getString("user_name"))
-                        .build();
-                Request okrequest = new Request.Builder()
-                        .url("http://localhost:9010/management-center/api/user/add")
-                        .post(req)
-                        .build();
-                Response response = null;
-                JSONArray newRows = new JSONArray();
-                try {
-                    response = client.newCall(okrequest).execute();
-                    String resStr = response.body().string();
-                    JSONObject resJo = JSONObject.parseObject(resStr);
-                }catch (Exception e){
-                    System.out.println("创建账号失败");
-                    return false;
-                }
+
+
+
             }
         }
         //String ipCurrent = this.toIPv4(request.getRemoteHost());
