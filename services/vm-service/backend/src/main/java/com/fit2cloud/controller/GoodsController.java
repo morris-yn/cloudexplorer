@@ -150,6 +150,14 @@ public class GoodsController {
         return ResultHolder.of(result.getInteger("code"),result.getString("msg"),result.getString("data"));
     }
 
+
+    @Operation(summary = "", description = "直播管理信息")
+    @GetMapping("/getLiveManageInfo")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> getLiveManageInfo() {
+        JSONObject result = iVmDefaultService.getLiveManageInfo();
+        return ResultHolder.of(result.getInteger("code"),result.getString("msg"),result.getString("data"));
+    }
     
 
     @Operation(summary = "", description = "boom")

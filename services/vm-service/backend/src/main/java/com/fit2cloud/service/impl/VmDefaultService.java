@@ -345,6 +345,11 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         JSONArray list = validtimeMapper.selectAllVmCloudServerByUserId(liveGoodsMapper.selectUserId(UserContext.getToken()));
         for(Object item : list){
             JSONObject jitem = (JSONObject) item;
+            if(jitem.getString("id") == null){
+                jitem.put("instance_name","未开通");
+                jitem.put("status", "-");
+                continue;
+            }
             jitem.put("instance_name",jitem.getString("id").substring(0,4).toUpperCase());
             jitem.put("status", this.toF2CStatus(jitem.getString("status")));
         }
@@ -465,6 +470,11 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         result.put("msg","ok");
         result.put("data",builder.toString().toString());
         return result;
+    }
+
+    @Override
+    public JSONObject getLiveManageInfo() {
+        return null;
     }
 
 

@@ -55,4 +55,6 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
     JSONObject addSubUser(String info);
 
     JSONObject getLiveUrl();
+
+    JSONObject getLiveManageInfo();
 }
