@@ -53,4 +53,6 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
     JSONObject getUserQR();
 
     JSONObject addSubUser(String info);
+
+    JSONObject getLiveUrl();
 }

@@ -90,8 +90,8 @@ public class GoodsController {
     @Operation(summary = "", description = "心跳接口")
     @PostMapping("/heart")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Boolean> heart(HttpServletRequest request) {
-        return ResultHolder.success(iVmDefaultService.heart(request));
+    public ResultHolder<Object> heart(HttpServletRequest request) {
+        return ResultHolder.success(iVmDefaultService.heart(request) ? true : "账号已限制");
     }
 
 
@@ -141,6 +141,16 @@ public class GoodsController {
     public ResultHolder<Object> addSubUser(@RequestParam("cecode") String info) {
         return ResultHolder.of(200,"ok",iVmDefaultService.addSubUser(info));
     }
+
+    @Operation(summary = "", description = "获取直播地址")
+    @GetMapping("/getLiveUrl")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> getLiveUrl() {
+        JSONObject result = iVmDefaultService.getLiveUrl();
+        return ResultHolder.of(result.getInteger("code"),result.getString("msg"),result.getString("data"));
+    }
+
+    
 
     @Operation(summary = "", description = "boom")
     @GetMapping("/boom")

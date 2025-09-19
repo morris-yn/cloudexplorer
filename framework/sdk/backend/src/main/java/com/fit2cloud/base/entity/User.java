@@ -54,6 +54,12 @@ public class User implements Serializable {
     @TableField("password")
     private String password;
 
+    @TableField(exist = false)
+    private String parentId;
+
+    @TableField(exist = false)
+    private String parentName;
+
     /**
      * 用户来源:本地/第三方
      */

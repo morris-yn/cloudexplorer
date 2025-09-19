@@ -271,6 +271,9 @@ const tableConfig = ref<TableConfig>({
         </span>
       </template>
     </el-table-column>
+    <el-table-column prop="parentName" label="父账号" fixed>
+
+    </el-table-column>
     <el-table-column
       prop="enabled"
       :label="$t('user.status')"

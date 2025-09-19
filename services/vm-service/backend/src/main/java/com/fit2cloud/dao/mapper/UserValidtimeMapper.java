@@ -20,4 +20,9 @@ public interface UserValidtimeMapper extends BaseMapper<UserValidtime> {
 
     public JSONArray selectAllVmCloudServerByUserId(@Param("userId") String userId);
 
+    @Select("""
+            select enabled from user where source = #{id}
+            """)
+    public Boolean getUserEnabled(String id);
+
 }

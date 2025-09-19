@@ -32,6 +32,8 @@ import com.fit2cloud.request.role.RoleRequest;
 import com.fit2cloud.service.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +81,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Resource
     WorkspaceCommonService workspaceCommonService;
+
+    @Resource
+    UserMapper userMapper;
 
     @Override
     public IPage<UserDto> pageUser(PageUserRequest pageUserRequest) {
@@ -130,6 +135,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             UserDto userDto = new UserDto();
             userDto.setRoles(roleService.getRolesByResourceIds(param));
             BeanUtils.copyProperties(user, userDto);
+            String[] userIds = user.getSource().split("-");
+            Map parentInfo = userMapper.getParentInfo(userIds.length == 2 ? userIds[1] : userIds[0]);
+            if(Objects.isNull(parentInfo)){
+                userDto.setParentId("-");
+                userDto.setParentName("-");
+            }else {
+                userDto.setParentId(parentInfo.get("user_id").toString());
+                userDto.setParentName(parentInfo.get("user_name").toString());
+            }
 
             Map<RoleConstants.ROLE, List<UserRoleDto>> userRoleMap = userRoleService.getUserRoleMap(user.getId());
 
@@ -141,6 +155,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
 
             userDto.setRoleMap(userRoleMap);
+
 
             return userDto;
         });

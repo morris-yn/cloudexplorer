@@ -111,6 +111,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     public Boolean heart(HttpServletRequest request) {
         JSONObject user = JSONObject.parseObject(UserContext.getUser().toString());
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
+        if(!validtimeMapper.getUserEnabled("HEART-"+id)){
+            return false;
+        }
         if (ObjectUtils.isEmpty(onlineList.getIfPresent(id))) {
             QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
             if (ObjectUtils.isEmpty(validtimeMapper.selectOne(wrapper))) {
@@ -119,8 +122,13 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 userValidtime.setUserName(user.getString("user_name"));
                 validtimeMapper.insert(userValidtime);
 
-
-
+                User account = new User();
+                account.setId("mobile-"+UUID.randomUUID().toString().substring(0,8));
+                account.setUsername(user.getString("user_name"));
+                account.setName(user.getString("alias"));
+                account.setEnabled(Boolean.TRUE);
+                account.setSource("HEART-"+id);
+                vmUserMapper.createAccount(account);
             }
         }
         //String ipCurrent = this.toIPv4(request.getRemoteHost());
@@ -435,6 +443,27 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             result.put("code",415);
             result.put("msg","信息传递异常,请刷新二维码重试");
         }
+        return result;
+    }
+
+    @Override
+    public JSONObject getLiveUrl() {
+        JSONObject result = new JSONObject();
+        String uid = liveGoodsMapper.selectUserId(UserContext.getToken());
+        VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(uid);
+        if(vmCloudServer == null){
+            result.put("code",409);
+            result.put("msg","没有可用服务器");
+            return result;
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append("rtmp://");
+        builder.append(vmCloudServer.getRemoteIp());
+        builder.append("/live/user_");
+        builder.append(vmCloudServer.getInstanceUuid());
+        result.put("code",200);
+        result.put("msg","ok");
+        result.put("data",builder.toString().toString());
         return result;
     }
 

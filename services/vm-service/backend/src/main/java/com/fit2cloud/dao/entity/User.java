@@ -46,10 +46,10 @@ public class User implements Serializable {
     private Boolean enabled;
 
     @TableField("email")
-    private String email;
+    private String email = "heartAccount@a.com";
 
     @TableField("phone")
-    private String phone;
+    private String phone = "000000000";
 
     @TableField("password")
     private String password = "-------";

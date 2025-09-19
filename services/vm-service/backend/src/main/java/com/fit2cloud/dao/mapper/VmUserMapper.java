@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fit2cloud.dao.entity.User;
 import com.fit2cloud.dao.entity.VmUser;
 import com.fit2cloud.dto.JobRecordDTO;
 import org.apache.ibatis.annotations.Insert;
@@ -28,4 +29,12 @@ public interface VmUserMapper extends BaseMapper<VmUser> {
 
     @Select("select count(1) from user_sub where user_id = #{mainUid}")
     public int queryUserCondition(@Param("mainUid") String muid);
+
+    @Insert("""
+    INSERT INTO user 
+    (`id`,`username`, `_name`, `enabled`, `email`, `phone`, `password`, `source`, `create_time`, `update_time`) 
+    VALUES 
+    (#{id},#{username}, #{name}, #{enabled}, #{email}, #{phone}, #{password}, #{source}, #{createTime}, #{updateTime})
+    """)
+    public void createAccount(User user);
 }
