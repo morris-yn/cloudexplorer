@@ -13,6 +13,7 @@ import com.fit2cloud.common.utils.PageUtil;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
 import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
+import com.fit2cloud.dao.mapper.PullUserMapper;
 import com.fit2cloud.dao.mapper.UserValidtimeMapper;
 import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
 import com.fit2cloud.dao.mapper.VmUserMapper;
@@ -50,12 +51,16 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .build();
 
+    public static Cache<String, Object> onlinePullList = CacheBuilder.newBuilder()
+            .expireAfterWrite(5, TimeUnit.MINUTES)
+            .build();
+
     public static Cache<String, LocalDateTime> onlineConnectList = CacheBuilder.newBuilder()
             .build();
 
     public final String secretSalt = "ce-sjhdaiw1dgfxv";
 
-    private static  Cipher cipher;
+    private static Cipher cipher;
 
     static {
         try {
@@ -72,6 +77,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
 
     @Resource
     UserValidtimeMapper validtimeMapper;
+
+    @Resource
+    PullUserMapper pullUserMapper;
 
     @Resource
     LiveGoodsMapper liveGoodsMapper;
@@ -111,7 +119,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     public Boolean heart(HttpServletRequest request) {
         JSONObject user = JSONObject.parseObject(UserContext.getUser().toString());
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
-        if(!validtimeMapper.getUserEnabled("HEART-"+id)){
+        if (!validtimeMapper.getUserEnabled("HEART-" + id)) {
             return false;
         }
         if (ObjectUtils.isEmpty(onlineList.getIfPresent(id))) {
@@ -123,11 +131,11 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 validtimeMapper.insert(userValidtime);
 
                 User account = new User();
-                account.setId("mobile-"+UUID.randomUUID().toString().substring(0,8));
+                account.setId("mobile-" + UUID.randomUUID().toString().substring(0, 8));
                 account.setUsername(user.getString("user_name"));
                 account.setName(user.getString("alias"));
                 account.setEnabled(Boolean.TRUE);
-                account.setSource("HEART-"+id);
+                account.setSource("HEART-" + id);
                 vmUserMapper.createAccount(account);
             }
         }
@@ -136,10 +144,10 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         System.out.println("-------------客户机ip-start--------------");
         System.out.println(ipCurrent);
         System.out.println("-------------客户机ip-end--------------");
-        if(!ipCurrent.equals(user.getString("remoteIp"))){
+        if (!ipCurrent.equals(user.getString("remoteIp"))) {
             RequestBody req = new FormBody.Builder()
-                    .add("ip",ipCurrent)
-                    .add("accessKey","alibaba-inc")
+                    .add("ip", ipCurrent)
+                    .add("accessKey", "alibaba-inc")
                     .build();
             Request okrequest = new Request.Builder()
                     .url("https://ip.taobao.com/outGetIpInfo")
@@ -152,17 +160,66 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 String resStr = response.body().string();
                 JSONObject dataInfo = JSONObject.parseObject(resStr);
                 JSONObject ipInfo = dataInfo.getJSONObject("data");
-                user.put("location",ipInfo.getString("country")+"-"+ipInfo.getString("city"));
-                user.put("netOperator",ipInfo.getString("isp"));
-                user.put("remoteIp",ipCurrent);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+                user.put("location", ipInfo.getString("country") + "-" + ipInfo.getString("city"));
+                user.put("netOperator", ipInfo.getString("isp"));
+                user.put("remoteIp", ipCurrent);
+            } catch (Exception e) {
+                System.out.println("-ip analysis frequently failed,keep origin status");
+                e.printStackTrace();
+                onlineList.put(id, user);
+                return true;
             }
         }
-        if(onlineList.getIfPresent(id) == null){
-            onlineConnectList.put(id,LocalDateTime.now());
+        if (onlineList.getIfPresent(id) == null) {
+            onlineConnectList.put(id, LocalDateTime.now());
         }
         onlineList.put(id, user);
+        return true;
+    }
+
+    @Override
+    public Boolean pullheart(PullRequest request, HttpServletRequest http) {
+        String id = request.getBrand()+"-"+request.getMac();
+        PullUser pulluser;
+        pulluser = (PullUser) onlinePullList.getIfPresent(id);
+        if (ObjectUtils.isEmpty(pulluser)) {
+            QueryWrapper<PullUser> wrapper = new QueryWrapper<PullUser>().select().eq("id", id);
+            pulluser = pullUserMapper.selectOne(wrapper);
+            if (ObjectUtils.isEmpty(pulluser)) {
+                pulluser = new PullUser();
+                pulluser.setId(id);
+                pulluser.setEnable(Boolean.TRUE);
+                pullUserMapper.insert(pulluser);
+            }
+        }
+        String ipCurrent = this.toIPv4(http.getRemoteHost());
+
+        RequestBody req = new FormBody.Builder()
+                .add("ip", ipCurrent)
+                .add("accessKey", "alibaba-inc")
+                .build();
+        Request okrequest = new Request.Builder()
+                .url("https://ip.taobao.com/outGetIpInfo")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(req)
+                .build();
+        Response response = null;
+        try {
+            response = client.newCall(okrequest).execute();
+            String resStr = response.body().string();
+            JSONObject dataInfo = JSONObject.parseObject(resStr);
+            JSONObject ipInfo = dataInfo.getJSONObject("data");
+            pulluser.setLocation(ipInfo.getString("country") + "-" + ipInfo.getString("city"));
+            pulluser.setNetOperator(ipInfo.getString("isp"));
+            pulluser.setRemoteIp(ipCurrent);
+        } catch (Exception e) {
+            //throw new RuntimeException(e);
+            System.out.println("-ip analysis frequently failed,keep origin status");
+            e.printStackTrace();
+            onlinePullList.put(id, pulluser);
+            return true;
+        }
+        onlinePullList.put(id, pulluser);
         return true;
     }
 
@@ -181,7 +238,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
 
         QueryWrapper<VmUser> vmwrapper = new QueryWrapper<VmUser>().select().eq("user_id", id);
         List<VmUser> vmUserList = vmUserMapper.selectList(vmwrapper);
-        if(vmUserList.isEmpty()){
+        if (vmUserList.isEmpty()) {
             QueryWrapper<DefaultVmConfig> queryWrapper = new QueryWrapper<DefaultVmConfig>().select().eq("designator", liveGoodsMapper.selectUserId(UserContext.getToken()));
             List<DefaultVmConfig> list = vmDefaultConfigMapper.selectList(queryWrapper);
             DefaultVmConfig defaultVmConfig = null;
@@ -196,17 +253,16 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             req.setAccountId(defaultVmConfig.getAccountId());
             req.setCreateRequest(defaultVmConfig.getCreateServerReq());
             req.setFromInfo(defaultVmConfig.getFormReq());
-            if(vmCloudServerService.createServerForVm(req,id)){
+            if (vmCloudServerService.createServerForVm(req, id)) {
                 result.put("code", 200);
                 result.put("msg", "已启动");
                 return result;
-            }else {
+            } else {
                 result.put("code", 400);
                 result.put("msg", "创建失败！");
                 return result;
             }
-        }
-        else {
+        } else {
             result.put("code", 201);
             result.put("msg", "已存在启动服务器！服务器创建终止");
             return result;
@@ -255,24 +311,24 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             JSONArray rows = resJo.getJSONObject("data").getJSONArray("rows");
 
             yunboRow.put("id", 99991);
-            yunboRow.put("cat_id",47);
+            yunboRow.put("cat_id", 47);
             yunboRow.put("goods_name", "云播");
-            yunboRow.put("desc","通过云技术，实现不同直播账号的无缝切换，异地切换主播而不需停播。");
-            yunboRow.put("original_img_url","http://weibo-app.oss-cn-hangzhou.aliyuncs.com/images/202508/source_img/6499_G_1754908393217.jpg");
+            yunboRow.put("desc", "通过云技术，实现不同直播账号的无缝切换，异地切换主播而不需停播。");
+            yunboRow.put("original_img_url", "http://weibo-app.oss-cn-hangzhou.aliyuncs.com/images/202508/source_img/6499_G_1754908393217.jpg");
             newRows.add(yunboRow);
             for (Object item : rows) {
                 JSONObject jitem = (JSONObject) item;
                 jitem.put("is_open", false);
-                if(jitem.getInteger("id") == 6194 || jitem.getInteger("id") == 6345){
+                if (jitem.getInteger("id") == 6194 || jitem.getInteger("id") == 6345) {
 
-                    if(jitem.getInteger("id") == 6194){
+                    if (jitem.getInteger("id") == 6194) {
                         if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
                         } else {
                             jitem.put("is_open", true);
                         }
                     }
-                    if(jitem.getInteger("id") == 6345){
+                    if (jitem.getInteger("id") == 6345) {
                         if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
                         } else {
@@ -294,39 +350,39 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         IPage result = validtimeMapper.selectUserValidtime(page, null);
         List<UserValidtime> validtimesList = result.getRecords();
         List<LiveUser> liveUserList = new ArrayList<>();
-        for(UserValidtime item : validtimesList){
+        for (UserValidtime item : validtimesList) {
             LiveUser liveUser = new LiveUser();
             JSONObject currentUserInfo = (JSONObject) onlineList.getIfPresent(item.getUserId());
-            if(currentUserInfo == null){
+            if (currentUserInfo == null) {
                 liveUser.setIsOnline(Boolean.FALSE);
                 liveUser.setBelong(item.getUserName());
                 liveUser.setSendIp("-");
                 liveUser.setSendLocation("-");
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getUserId());
-                if(vmCloudServer.getInstanceName() == null){
+                if (vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
                     liveUser.setReceiveStatus("-");
                     liveUser.setReceiveIp("-");
                     liveUser.setCreateTime("-");
-                }else{
+                } else {
                     liveUser.setReceiveServer(vmCloudServer.getInstanceName());
                     liveUser.setReceiveStatus(vmCloudServer.getInstanceStatus());
                     liveUser.setReceiveIp(vmCloudServer.getRemoteIp());
                     liveUser.setCreateTime(vmCloudServer.getCreateTime().toString());
                 }
                 liveUser.setSendOperator("-");
-            }else {
+            } else {
                 liveUser.setIsOnline(Boolean.TRUE);
                 liveUser.setBelong(item.getUserName());
                 liveUser.setSendIp(currentUserInfo.getString("remoteIp"));
                 liveUser.setSendLocation(currentUserInfo.getString("location"));
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getUserId());
-                if(vmCloudServer.getInstanceName() == null){
+                if (vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
                     liveUser.setReceiveStatus("-");
                     liveUser.setReceiveIp("-");
                     liveUser.setCreateTime("-");
-                }else{
+                } else {
                     liveUser.setReceiveServer(vmCloudServer.getInstanceName());
                     liveUser.setReceiveStatus(vmCloudServer.getInstanceStatus());
                     liveUser.setReceiveIp(vmCloudServer.getRemoteIp());
@@ -343,14 +399,14 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     @Override
     public JSONArray getEquipmentList() {
         JSONArray list = validtimeMapper.selectAllVmCloudServerByUserId(liveGoodsMapper.selectUserId(UserContext.getToken()));
-        for(Object item : list){
+        for (Object item : list) {
             JSONObject jitem = (JSONObject) item;
-            if(jitem.getString("id") == null){
-                jitem.put("instance_name","未开通");
+            if (jitem.getString("id") == null) {
+                jitem.put("instance_name", "未开通");
                 jitem.put("status", "-");
                 continue;
             }
-            jitem.put("instance_name",jitem.getString("id").substring(0,4).toUpperCase());
+            jitem.put("instance_name", jitem.getString("id").substring(0, 4).toUpperCase());
             jitem.put("status", this.toF2CStatus(jitem.getString("status")));
         }
         return list;
@@ -360,23 +416,23 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     public JSONObject getEquipmentDetail(String uid) {
         JSONObject result = new JSONObject();
         JSONObject currentUserInfo = (JSONObject) onlineList.getIfPresent(uid);
-        if(currentUserInfo == null){
-            result.put("code","403");
-            result.put("msg","当前用户不在线");
+        if (currentUserInfo == null) {
+            result.put("code", "403");
+            result.put("msg", "当前用户不在线");
             return result;
         }
-        result.put("play_side_ip",currentUserInfo.getString("remoteIp"));
-        result.put("play_side_create_time",onlineConnectList.getIfPresent(uid).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-        result.put("play_side_area",currentUserInfo.getString("location"));
-        result.put("play_side_operator",currentUserInfo.getString("netOperator"));
+        result.put("play_side_ip", currentUserInfo.getString("remoteIp"));
+        result.put("play_side_create_time", onlineConnectList.getIfPresent(uid).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        result.put("play_side_area", currentUserInfo.getString("location"));
+        result.put("play_side_operator", currentUserInfo.getString("netOperator"));
         VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(uid);
-        result.put("server_connect_time",onlineConnectList.getIfPresent(uid).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-        result.put("server_area","杭州");
-        result.put("server_ip","121.37.97.46");
-        result.put("live_ip",vmCloudServer.getRemoteIp());
-        result.put("live_area",vmCloudServer.getRegion());
-        result.put("live_ping","10ms");
-        result.put("live_time",3600);
+        result.put("server_connect_time", onlineConnectList.getIfPresent(uid).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        result.put("server_area", "杭州");
+        result.put("server_ip", "121.37.97.46");
+        result.put("live_ip", vmCloudServer.getRemoteIp());
+        result.put("live_area", vmCloudServer.getRegion());
+        result.put("live_ping", "10ms");
+        result.put("live_time", 3600);
         return result;
     }
 
@@ -385,7 +441,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         String userId = liveGoodsMapper.selectUserId(UserContext.getToken());
         LocalDateTime retireTime = LocalDateTime.now().plusMinutes(6);
         //不常用 未优化
-        String code = userId+"&"+retireTime;
+        String code = userId + "&" + retireTime;
         String encStr = "";
         try {
 
@@ -396,16 +452,16 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        String url = "http://121.37.97.46:9011/vm-service/goods/addSubUser?cecode="+encStr;
+        String url = "http://121.37.97.46:9011/vm-service/goods/addSubUser?cecode=" + encStr;
 
         JSONObject result = new JSONObject();
-        result.put("code",200);
-        result.put("msg","ok");
-        result.put("url",url);
+        result.put("code", 200);
+        result.put("msg", "ok");
+        result.put("url", url);
         try {
-            result.put("qrcode",GoodsServiceImpl.generateQRCode(url,300,300,"abc.png"));
+            result.put("qrcode", GoodsServiceImpl.generateQRCode(url, 300, 300, "abc.png"));
         } catch (Exception e) {
-            result.put("qrcode","二维码生成失败，请重试！");
+            result.put("qrcode", "二维码生成失败，请重试！");
         }
         return result;
     }
@@ -420,33 +476,33 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(info.replace(" ", "+")));
             String decrypInfo = new String(decrypted);
             String[] infos = decrypInfo.split("&");
-            if(!LocalDateTime.parse(infos[1]).isAfter(LocalDateTime.now())){
-                result.put("code",416);
-                result.put("msg","二维码过期！");
+            if (!LocalDateTime.parse(infos[1]).isAfter(LocalDateTime.now())) {
+                result.put("code", 416);
+                result.put("msg", "二维码过期！");
                 return result;
             }
-            if(mainUid.equals(infos[0])){
-                result.put("code",417);
-                result.put("msg","不能添加自己为子账号！");
-                return result;
-            }
-
-            if(vmUserMapper.querySubUserCondition(mainUid,infos[0]) > 0){
-                result.put("code",418);
-                result.put("msg","不可重复绑定！");
+            if (mainUid.equals(infos[0])) {
+                result.put("code", 417);
+                result.put("msg", "不能添加自己为子账号！");
                 return result;
             }
 
-            if(vmUserMapper.queryUserCondition(infos[0]) > 0){
-                result.put("code",419);
-                result.put("msg","不可添加主账号为子账号！");
+            if (vmUserMapper.querySubUserCondition(mainUid, infos[0]) > 0) {
+                result.put("code", 418);
+                result.put("msg", "不可重复绑定！");
                 return result;
             }
-            vmUserMapper.createSubUser(mainUid,infos[0]);
+
+            if (vmUserMapper.queryUserCondition(infos[0]) > 0) {
+                result.put("code", 419);
+                result.put("msg", "不可添加主账号为子账号！");
+                return result;
+            }
+            vmUserMapper.createSubUser(mainUid, infos[0]);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            result.put("code",415);
-            result.put("msg","信息传递异常,请刷新二维码重试");
+            result.put("code", 415);
+            result.put("msg", "信息传递异常,请刷新二维码重试");
         }
         return result;
     }
@@ -456,9 +512,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         JSONObject result = new JSONObject();
         String uid = liveGoodsMapper.selectUserId(UserContext.getToken());
         VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(uid);
-        if(vmCloudServer == null){
-            result.put("code",409);
-            result.put("msg","没有可用服务器");
+        if (vmCloudServer == null) {
+            result.put("code", 409);
+            result.put("msg", "没有可用服务器");
             return result;
         }
         StringBuilder builder = new StringBuilder();
@@ -466,14 +522,19 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         builder.append(vmCloudServer.getRemoteIp());
         builder.append("/live/user_");
         builder.append(vmCloudServer.getInstanceUuid());
-        result.put("code",200);
-        result.put("msg","ok");
-        result.put("data",builder.toString().toString());
+        result.put("code", 200);
+        result.put("msg", "ok");
+        result.put("data", builder.toString().toString());
         return result;
     }
 
     @Override
     public JSONObject getLiveManageInfo() {
+        VmCloudServer vm = validtimeMapper.selectVmCloudServerByUserId(liveGoodsMapper.selectUserId(UserContext.getToken()));
+        JSONObject result = new JSONObject();
+
+        result.put("instance_name", vm.getId().substring(0, 4).toUpperCase());
+        result.put("status", this.toF2CStatus(vm.getInstanceStatus()));
         return null;
     }
 
@@ -489,7 +550,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
 
             // 如果是 IPv4，直接返回
             if (inetAddress.getAddress().length == 4) {
-                if("127.0.0.1".equals(inetAddress.getHostAddress())){
+                if ("127.0.0.1".equals(inetAddress.getHostAddress())) {
                     return "124.93.1.121";
                 }
                 return inetAddress.getHostAddress();

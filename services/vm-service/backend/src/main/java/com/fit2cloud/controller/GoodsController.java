@@ -3,10 +3,7 @@ package com.fit2cloud.controller;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.fit2cloud.controller.handler.ResultHolder;
-import com.fit2cloud.dao.entity.CDcard;
-import com.fit2cloud.dao.entity.ConfrimPayment;
-import com.fit2cloud.dao.entity.GoodsToCart;
-import com.fit2cloud.dao.entity.LiveGoods;
+import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.service.IGoodsService;
 import com.fit2cloud.service.IVmDefaultService;
 import com.fit2cloud.utils.UserContext;
@@ -94,6 +91,12 @@ public class GoodsController {
         return ResultHolder.success(iVmDefaultService.heart(request) ? true : "账号已限制");
     }
 
+    @Operation(summary = "", description = "拉流心跳接口")
+    @PostMapping("/pullheart")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> pullheart(@RequestBody PullRequest request , HttpServletRequest http) {
+        return ResultHolder.success(iVmDefaultService.pullheart(request,http) ? true : "账号已限制");
+    }
 
     @Operation(summary = "", description = "开播")
     @PostMapping("/startVm")

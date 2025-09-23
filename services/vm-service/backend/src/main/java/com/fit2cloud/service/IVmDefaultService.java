@@ -8,6 +8,7 @@ import com.fit2cloud.base.entity.VmCloudDisk;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
 import com.fit2cloud.dao.entity.DefaultVmConfig;
 import com.fit2cloud.dao.entity.LiveUser;
+import com.fit2cloud.dao.entity.PullRequest;
 import com.fit2cloud.dao.entity.UserValidtime;
 import com.fit2cloud.dto.JobRecordDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,8 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
     JobRecordDTO getRecord(String id);
 
     Boolean heart(HttpServletRequest request);
+
+    Boolean pullheart(PullRequest request,HttpServletRequest http);
 
     Map startVm();
 
