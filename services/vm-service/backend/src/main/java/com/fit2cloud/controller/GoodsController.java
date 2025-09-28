@@ -157,8 +157,8 @@ public class GoodsController {
     @Operation(summary = "", description = "直播管理信息")
     @GetMapping("/getLiveManageInfo")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Object> getLiveManageInfo() {
-        JSONObject result = iVmDefaultService.getLiveManageInfo();
+    public ResultHolder<Object> getLiveManageInfo(@RequestParam("uid") String uid) {
+        JSONObject result = iVmDefaultService.getLiveManageInfo(uid);
         return ResultHolder.of(result.getInteger("code"),result.getString("msg"),result.getString("data"));
     }
     

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -529,12 +530,17 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     }
 
     @Override
-    public JSONObject getLiveManageInfo() {
-        VmCloudServer vm = validtimeMapper.selectVmCloudServerByUserId(liveGoodsMapper.selectUserId(UserContext.getToken()));
+    public JSONObject getLiveManageInfo(String uid) {
+        VmCloudServer vm = validtimeMapper.selectVmCloudServerByUserId(uid);
         JSONObject result = new JSONObject();
 
         result.put("instance_name", vm.getId().substring(0, 4).toUpperCase());
         result.put("status", this.toF2CStatus(vm.getInstanceStatus()));
+        result.put("ip", vm.getRemoteIp());
+        Duration duration = Duration.between(vm.getCreateTime(), LocalDateTime.now());
+        result.put("run_time", duration.toHours());
+        result.put("live_sessions", this.toF2CStatus(vm.getInstanceStatus()));
+
         return null;
     }
 

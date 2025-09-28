@@ -59,5 +59,5 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
 
     JSONObject getLiveUrl();
 
-    JSONObject getLiveManageInfo();
+    JSONObject getLiveManageInfo(String uid);
 }
