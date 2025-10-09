@@ -14,7 +14,7 @@ import org.apache.ibatis.annotations.Update;
 
 public interface VmDefaultConfigMapper extends BaseMapper<DefaultVmConfig> {
 
-    @Insert("insert into vm_logs('type','info') values (#{arg1},#{arg2})")
+    @Insert("insert into vm_logs('type','info','create_user') values (#{arg1},#{arg2},#{arg3})")
     public void setLog(Integer type,String msg);
 
     @Select("select * from user_validtime where user_id = #{arg1}")

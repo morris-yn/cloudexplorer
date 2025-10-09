@@ -223,7 +223,7 @@ public class GoodsServiceImpl implements IGoodsService {
         String payLogId = liveGoodsMapper.getPayLogId(orderId);
         result.put("payLogId", payLogId);
         result.put("retired", 5);
-        LogUtils.setLog(LogContants.ORDER.getCode(), JSONObject.toJSONString(result));
+        LogUtils.setLog(LogContants.ORDER.getCode(), JSONObject.toJSONString(result),userid);
         return result;
     }
 

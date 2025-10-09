@@ -12,14 +12,13 @@ import com.fit2cloud.common.utils.ColumnNameUtil;
 import com.fit2cloud.common.utils.PageUtil;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
 import com.fit2cloud.dao.entity.*;
+import com.fit2cloud.dao.entity.contant.LogContants;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
-import com.fit2cloud.dao.mapper.PullUserMapper;
-import com.fit2cloud.dao.mapper.UserValidtimeMapper;
-import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
-import com.fit2cloud.dao.mapper.VmUserMapper;
+import com.fit2cloud.dao.mapper.*;
 import com.fit2cloud.dto.JobRecordDTO;
 import com.fit2cloud.service.IVmCloudServerService;
 import com.fit2cloud.service.IVmDefaultService;
+import com.fit2cloud.utils.LogUtils;
 import com.fit2cloud.utils.UserContext;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -91,6 +90,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     @Resource
     VmUserMapper vmUserMapper;
 
+    @Resource
+    VmLogsMapper vmLogsMapper;
+
     private static OkHttpClient client = new OkHttpClient();
 
     @Override
@@ -138,6 +140,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 account.setEnabled(Boolean.TRUE);
                 account.setSource("HEART-" + id);
                 vmUserMapper.createAccount(account);
+
             }
         }
         //String ipCurrent = this.toIPv4(request.getRemoteHost());
@@ -257,15 +260,18 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             if (vmCloudServerService.createServerForVm(req, id)) {
                 result.put("code", 200);
                 result.put("msg", "已启动");
+                LogUtils.setLog(LogContants.RUNTIME.getCode(),"服务端创建成功",id);
                 return result;
             } else {
                 result.put("code", 400);
                 result.put("msg", "创建失败！");
+                LogUtils.setLog(LogContants.RUNTIME.getCode(),"服务端创建失败。",id);
                 return result;
             }
         } else {
             result.put("code", 201);
             result.put("msg", "已存在启动服务器！服务器创建终止");
+            LogUtils.setLog(LogContants.RUNTIME.getCode(), "已存在启动服务器，持续调用。服务端创建成功。",id);
             return result;
         }
     }
@@ -526,6 +532,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         result.put("code", 200);
         result.put("msg", "ok");
         result.put("data", builder.toString().toString());
+        LogUtils.setLog(LogContants.RUNTIME.getCode(),"获取推流地址...",uid);
         return result;
     }
 
@@ -539,9 +546,15 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         result.put("ip", vm.getRemoteIp());
         Duration duration = Duration.between(vm.getCreateTime(), LocalDateTime.now());
         result.put("run_time", duration.toHours());
-        result.put("live_sessions", this.toF2CStatus(vm.getInstanceStatus()));
+        result.put("live_sessions", vmLogsMapper.getLiveSessions(uid));
+        result.put("logs", vmLogsMapper.getRecentLogs(uid));
+        return result;
+    }
 
-        return null;
+    @Override
+    public Boolean logs(String loginfo) {
+        LogUtils.setLog(LogContants.RUNTIME.getCode(),loginfo,liveGoodsMapper.selectUserId(UserContext.getToken()));
+        return true;
     }
 
 

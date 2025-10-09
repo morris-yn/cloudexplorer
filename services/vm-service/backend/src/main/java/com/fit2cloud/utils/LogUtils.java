@@ -23,7 +23,7 @@ public class LogUtils {
 
     private static final ExecutorService logExecutor = Executors.newSingleThreadExecutor();
 
-    public static void setLog(Integer type,String info){
+    public static void setLog(Integer type,String info,String uid){
         logExecutor.submit(() -> {
             vmDefaultConfigMapper.setLog(type,info);
         });

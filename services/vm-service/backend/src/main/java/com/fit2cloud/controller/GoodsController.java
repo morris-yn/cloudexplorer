@@ -176,4 +176,36 @@ public class GoodsController {
         }
         return ResultHolder.of(200,"ok","");
     }
+
+
+    @Operation(summary = "", description = "前端日志记录")
+    @GetMapping("/logs")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> logs(Object info) {
+        try {
+            if(info instanceof String){
+                iVmDefaultService.logs((String) info);
+            }
+            if(info instanceof Integer){
+                switch ((Integer)info){
+                    case 1:
+                        iVmDefaultService.logs("主播端推流成功");
+                        break;
+                    case 2:
+                        iVmDefaultService.logs("客户端拉流成功");
+                        break;
+                    case 3:
+                        iVmDefaultService.logs("直播开启");
+                        break;
+                    case 4:
+                        iVmDefaultService.logs("直播关闭");
+                        break;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ResultHolder.of(200,"ok","already record");
+    }
 }

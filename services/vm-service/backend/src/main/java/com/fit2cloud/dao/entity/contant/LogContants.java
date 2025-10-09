@@ -5,7 +5,8 @@ import lombok.Getter;
 public enum LogContants {
 
     ORDER(0,"订单"),
-    SERVER(1,"服务开通");
+    SERVER(1,"服务开通"),
+    RUNTIME(2,"运行");
 
     @Getter
     private final int code;
