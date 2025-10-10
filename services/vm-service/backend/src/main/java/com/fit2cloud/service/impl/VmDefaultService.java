@@ -301,7 +301,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
         QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
         UserValidtime userValidtime = validtimeMapper.selectOne(wrapper);
-        if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
+        if(userValidtime.getVaildTime() == null){
+            yunboRow.put("is_open", false);
+        }else if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
             yunboRow.put("is_open", false);
         } else {
             yunboRow.put("is_open", true);
