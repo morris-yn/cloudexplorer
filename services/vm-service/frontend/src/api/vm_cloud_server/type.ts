@@ -70,8 +70,15 @@ interface VmDefaultVO {
   osVersion?: string;
 }
 
+interface groupsInfo{
+    groupName: string;
+    pusherId: string;
+}
+
 interface onlineInfo {
   isOnline: boolean;
+  pullGroups?: string;
+  machineCode?: string;
   sendIp?: string;
   sendLocation?: string;
   sendOperator?: string;
@@ -184,6 +191,7 @@ interface GrantRequest {
 export type {
   onlineInfo,
   option,
+  groupsInfo,
   VmDefaultVO,
   VmCloudServerVO,
   ListVmCloudServerRequest,

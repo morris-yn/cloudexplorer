@@ -1,18 +1,29 @@
 package com.fit2cloud.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @TableName("pull_user")
 public class PullUser {
-
+    @TableId(value = "id", type = IdType.AUTO)
   private String id;
+  private String pullGroups;
   private String location;
   private String netOperator;
   private String remoteIp;
   private Boolean enable;
 
 
-  public String getId() {
+    public String getPullGroups() {
+        return pullGroups;
+    }
+
+    public void setPullGroups(String pullGroups) {
+        this.pullGroups = pullGroups;
+    }
+
+    public String getId() {
     return id;
   }
 

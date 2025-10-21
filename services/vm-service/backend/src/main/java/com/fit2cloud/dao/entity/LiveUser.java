@@ -10,6 +10,10 @@ public class LiveUser {
 
     private Boolean isOnline;
 
+    private String machineCode;
+
+    private String groups;
+
     private String sendIp;
 
     private String sendLocation;

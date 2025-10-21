@@ -93,6 +93,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     @Resource
     VmLogsMapper vmLogsMapper;
 
+    @Resource
+    GroupsInfoMapper groupsInfoMapper;
+
     private static OkHttpClient client = new OkHttpClient();
 
     @Override
@@ -122,9 +125,6 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     public Boolean heart(HttpServletRequest request) {
         JSONObject user = JSONObject.parseObject(UserContext.getUser().toString());
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
-        if (!validtimeMapper.getUserEnabled("HEART-" + id)) {
-            return false;
-        }
         if (ObjectUtils.isEmpty(onlineList.getIfPresent(id))) {
             QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
             if (ObjectUtils.isEmpty(validtimeMapper.selectOne(wrapper))) {
@@ -142,6 +142,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 vmUserMapper.createAccount(account);
 
             }
+        }
+        if (validtimeMapper.getUserEnabled("HEART-" + id) == null || !validtimeMapper.getUserEnabled("HEART-" + id)) {
+            return false;
         }
         //String ipCurrent = this.toIPv4(request.getRemoteHost());
         String ipCurrent = this.toIPv4(request.getHeader("X-Forwarded-For"));
@@ -301,7 +304,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
         QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
         UserValidtime userValidtime = validtimeMapper.selectOne(wrapper);
-        if(userValidtime.getVaildTime() == null){
+        if(userValidtime == null){
             yunboRow.put("is_open", false);
         }else if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
             yunboRow.put("is_open", false);
@@ -331,14 +334,18 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 if (jitem.getInteger("id") == 6194 || jitem.getInteger("id") == 6345) {
 
                     if (jitem.getInteger("id") == 6194) {
-                        if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
+                        if(userValidtime == null){
+                            yunboRow.put("is_open", false);
+                        }else if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
                         } else {
                             jitem.put("is_open", true);
                         }
                     }
                     if (jitem.getInteger("id") == 6345) {
-                        if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
+                        if(userValidtime == null){
+                            yunboRow.put("is_open", false);
+                        }else if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
                         } else {
                             jitem.put("is_open", true);
@@ -368,7 +375,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 liveUser.setSendIp("-");
                 liveUser.setSendLocation("-");
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getUserId());
-                if (vmCloudServer.getInstanceName() == null) {
+                if (vmCloudServer == null || vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
                     liveUser.setReceiveStatus("-");
                     liveUser.setReceiveIp("-");
@@ -386,6 +393,61 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 liveUser.setSendIp(currentUserInfo.getString("remoteIp"));
                 liveUser.setSendLocation(currentUserInfo.getString("location"));
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getUserId());
+                if (vmCloudServer.getInstanceName() == null) {
+                    liveUser.setReceiveServer("-");
+                    liveUser.setReceiveStatus("-");
+                    liveUser.setReceiveIp("-");
+                    liveUser.setCreateTime("-");
+                } else {
+                    liveUser.setReceiveServer(vmCloudServer.getInstanceName());
+                    liveUser.setReceiveStatus(vmCloudServer.getInstanceStatus());
+                    liveUser.setReceiveIp(vmCloudServer.getRemoteIp());
+                    liveUser.setCreateTime(vmCloudServer.getCreateTime().toString());
+                }
+                liveUser.setSendOperator(currentUserInfo.getString("netOperator"));
+            }
+            liveUserList.add(liveUser);
+        }
+        result.setRecords(liveUserList);
+        return result;
+    }
+
+    @Override
+    public IPage<LiveUser> pullInfoList(CreateServerRequest request) {
+        Page<PullUser> page = PageUtil.of(request, PullUser.class);
+        IPage result = pullUserMapper.selectPage(page, null);
+        List<PullUser> pullUserList = result.getRecords();
+        List<LiveUser> liveUserList = new ArrayList<>();
+        for (PullUser item : pullUserList) {
+            LiveUser liveUser = new LiveUser();
+            liveUser.setMachineCode(item.getId());
+            GroupsInfo ginfo = groupsInfoMapper.selectOne(new QueryWrapper<GroupsInfo>().eq("id",item.getPullGroups()));
+            liveUser.setGroups(ginfo == null ? "-" : ginfo.getGroupName());
+            JSONObject currentUserInfo = (JSONObject) onlinePullList.getIfPresent(item.getId()) == null ?  null : (JSONObject) onlinePullList.getIfPresent(item.getId());
+            if (currentUserInfo == null) {
+                liveUser.setIsOnline(Boolean.FALSE);
+//                liveUser.setBelong(item.getUserName());
+                liveUser.setSendIp("-");
+                liveUser.setSendLocation("-");
+                VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getPullGroups());
+                if (vmCloudServer == null || vmCloudServer.getInstanceName() == null) {
+                    liveUser.setReceiveServer("-");
+                    liveUser.setReceiveStatus("-");
+                    liveUser.setReceiveIp("-");
+                    liveUser.setCreateTime("-");
+                } else {
+                    liveUser.setReceiveServer(vmCloudServer.getInstanceName());
+                    liveUser.setReceiveStatus(vmCloudServer.getInstanceStatus());
+                    liveUser.setReceiveIp(vmCloudServer.getRemoteIp());
+                    liveUser.setCreateTime(vmCloudServer.getCreateTime().toString());
+                }
+                liveUser.setSendOperator("-");
+            } else {
+                liveUser.setIsOnline(Boolean.TRUE);
+//                liveUser.setBelong(item.getUserName());
+                liveUser.setSendIp(currentUserInfo.getString("remoteIp"));
+                liveUser.setSendLocation(currentUserInfo.getString("location"));
+                VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getPullGroups());
                 if (vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
                     liveUser.setReceiveStatus("-");
@@ -557,6 +619,56 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     public Boolean logs(String loginfo) {
         LogUtils.setLog(LogContants.RUNTIME.getCode(),loginfo,liveGoodsMapper.selectUserId(UserContext.getToken()));
         return true;
+    }
+
+    @Override
+    public List<GroupsInfo> getGroupsInfo() {
+        List<GroupsInfo> result = groupsInfoMapper.selectList(new QueryWrapper<GroupsInfo>());
+        return result;
+    }
+
+    @Override
+    public Boolean deleteGroups(String id) {
+        try {
+            groupsInfoMapper.delete(new QueryWrapper<GroupsInfo>().eq("id", id));
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public List<UserValidtime> pusherList() {
+        List<UserValidtime> list= validtimeMapper.selectList(new QueryWrapper<UserValidtime>());
+        return list;
+    }
+
+    @Override
+    public Boolean saveGroup(GroupsInfo groupsInfo) {
+        try{
+            groupsInfoMapper.insert(groupsInfo);
+        }catch (Exception e){
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public List<GroupsInfo> groupList() {
+
+        return groupsInfoMapper.selectList(new QueryWrapper<GroupsInfo>());
+    }
+
+    @Override
+    public Boolean groupSave(List<JSONObject> pullUsers) {
+        for (JSONObject item : pullUsers) {
+            PullUser pullUser = new PullUser();
+            pullUser.setId(item.getString("machineCode"));
+            pullUser.setPullGroups(item.getString("groups"));
+            pullUserMapper.updateById(pullUser);
+        }
+        return Boolean.TRUE;
     }
 
 

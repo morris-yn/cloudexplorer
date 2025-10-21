@@ -95,13 +95,21 @@ public class GoodsController {
     @PostMapping("/pullheart")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> pullheart(@RequestBody PullRequest request , HttpServletRequest http) {
-        return ResultHolder.success(iVmDefaultService.pullheart(request,http) ? true : "账号已限制");
+        return ResultHolder.success(iVmDefaultService.pullheart(request,http) ? "rtmp://120.26.203.216/live/user_i-bp10gt7yws743hdla1s5" : "账号已限制");
     }
 
     @Operation(summary = "", description = "开播")
     @PostMapping("/startVm")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> startVm() {
+        Map map = iVmDefaultService.startVm();
+        return ResultHolder.of(map.get("code"),map.get("msg"),null);
+    }
+
+    @Operation(summary = "", description = "重启服务器")
+    @PostMapping("/restartVm")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> restartVm() {
         Map map = iVmDefaultService.startVm();
         return ResultHolder.of(map.get("code"),map.get("msg"),null);
     }

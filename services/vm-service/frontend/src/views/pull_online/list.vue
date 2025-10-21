@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
-import VmCloudServerApi from "@/api/vm_cloud_server";
+import {ref, onMounted, onBeforeUnmount, computed} from "vue";
+import VmCloudServerApi, {groupsInfo, listpull, pusherList} from "@/api/vm_cloud_server";
 import type {onlineInfo, VmCloudServerVO, VmDefaultVO} from "@/api/vm_cloud_server/type";
-import { useRouter, type TypesConfig } from "vue-router";
+import {useRouter, type TypesConfig} from "vue-router";
 import {
   PaginationConfig,
   TableConfig,
   TableOperations,
   TableSearch,
 } from "@commons/components/ce-table/type";
-import { useI18n } from "vue-i18n";
-import { ElMessage, ElMessageBox, ElPopover } from "element-plus";
+import {useI18n} from "vue-i18n";
+import {ElMessage, ElMessageBox, ElPopover} from "element-plus";
 import _ from "lodash";
-import type { SimpleMap } from "@commons/api/base/type";
+import type {SimpleMap} from "@commons/api/base/type";
 import BaseCloudAccountApi from "@commons/api/cloud_account";
 import RecycleBinsApi from "@/api/recycle_bin";
 import Grant from "@/views/vm_cloud_server/grant.vue";
-import { usePermissionStore } from "@commons/stores/modules/permission";
+import {usePermissionStore} from "@commons/stores/modules/permission";
 import ButtonToolBar from "@commons/components/button-tool-bar/ButtonToolBar.vue";
 import VmServerStatusIcon from "@/views/vm_cloud_server/VmServerStatusIcon.vue";
 import {
@@ -26,16 +26,18 @@ import {
 import OrgTreeFilter from "@commons/components/table-filter/OrgTreeFilter.vue";
 import AddDisk from "@/views/vm_cloud_server/AddDisk.vue";
 import ChangeConfig from "@/views/vm_cloud_server/ChangeConfig.vue";
-import { classifyIP } from "@commons/utils/util";
+import {classifyIP} from "@commons/utils/util";
 import PlatformIcon from "@commons/components/platform-icon/index.vue";
 import InstanceStatusUtils from "@commons/utils/vm_cloud_server/InstanceStatusUtils";
 import Renew from "@/views/vm_cloud_server/Renew.vue";
-const { t } = useI18n();
+
+const {t} = useI18n();
 const permissionStore = usePermissionStore();
 const useRoute = useRouter();
 const table = ref<any>(null);
 const columns = ref([]);
 const tableData = ref<Array<onlineInfo>>([]);
+const groupsTableData = ref<Array<onlineInfo>>([]);
 const selectedRowData = ref<Array<VmCloudServerVO>>([]);
 const tableLoading = ref<boolean>(false);
 const cloudAccount = ref<Array<SimpleMap<string>>>([]);
@@ -48,9 +50,15 @@ const loading = ref<boolean>(false);
  */
 const orgTreeRef = ref();
 const orgPopRef = ref();
+const dialogVisible = ref<boolean>(false);
+const pushCreateDialogVisible = ref<boolean>(false);
+const pusher = ref("");
+const groupName = ref<string>("");
 const selectedOrganizationIds = computed(() =>
-  orgTreeRef.value?.getSelectedIds(false)
+    orgTreeRef.value?.getSelectedIds(false)
 );
+
+const pusherOptions = ref([]);
 
 /**
  * 表头：工作空间树筛选
@@ -58,8 +66,13 @@ const selectedOrganizationIds = computed(() =>
 const workspaceTreeRef = ref();
 const workspacePopRef = ref();
 const selectedWorkspaceIds = computed(() =>
-  workspaceTreeRef.value?.getSelectedIds(true)
+    workspaceTreeRef.value?.getSelectedIds(true)
 );
+
+const pushGroupsDialogVisible = ref<boolean>(false);
+const groupsOptions = ref([])
+const groupsMultipleSelection =ref([])
+const groupsSet = ref()
 
 /**
  * 表头：清空组织和工作空间树的选中项
@@ -84,20 +97,20 @@ instanceOperateMap.set("DELETE", t("", "删除"));
 // 表格头:状态筛选项
 const instanceStatusForTableSelect = computed(() => {
   return _.map(
-    InstanceStatusUtils.instanceStatusListForTableSelect.value,
-    (s) => {
-      return {
-        text: s.name?.value,
-        value: s.status,
-      };
-    }
+      InstanceStatusUtils.instanceStatusListForTableSelect.value,
+      (s) => {
+        return {
+          text: s.name?.value,
+          value: s.status,
+        };
+      }
   );
 });
 
 // 表格头:付费类型筛选项
 const chargeType = [
-  { text: t("commons.charge_type.prepaid"), value: "PrePaid" },
-  { text: t("commons.charge_type.postpaid"), value: "PostPaid" },
+  {text: t("commons.charge_type.prepaid"), value: "PrePaid"},
+  {text: t("commons.charge_type.postpaid"), value: "PostPaid"},
 ];
 
 const filterChargeType = (value: string) => {
@@ -144,23 +157,23 @@ const filterVmToolsStatus = (value: string) => {
  */
 const search = (condition: TableSearch) => {
   const params = TableSearch.toSearchParams(condition);
-  VmCloudServerApi.listOnline(
-    {
-      currentPage: tableConfig.value.paginationConfig.currentPage,
-      pageSize: tableConfig.value.paginationConfig.pageSize,
-      ...params,
-    },
-    tableLoading
+  VmCloudServerApi.listpull(
+      {
+        currentPage: tableConfig.value.paginationConfig.currentPage,
+        pageSize: tableConfig.value.paginationConfig.pageSize,
+        ...params,
+      },
+      tableLoading
   ).then((res) => {
     tableData.value = res.data.records;
 
     tableConfig.value.paginationConfig?.setTotal(
-      res.data.total,
-      tableConfig.value.paginationConfig
+        res.data.total,
+        tableConfig.value.paginationConfig
     );
     tableConfig.value.paginationConfig?.setCurrentPage(
-      res.data.current,
-      tableConfig.value.paginationConfig
+        res.data.current,
+        tableConfig.value.paginationConfig
     );
   });
 };
@@ -195,7 +208,7 @@ const searchCloudAccount = () => {
   BaseCloudAccountApi.listAll().then((result) => {
     if (result.data.length > 0) {
       result.data.forEach(function (v) {
-        const ca = { text: v.name, value: v.id };
+        const ca = {text: v.name, value: v.id};
         cloudAccount.value.push(ca);
       });
     }
@@ -250,8 +263,8 @@ const handleSelectionChange = (list: Array<VmCloudServerVO>) => {
 const showDetail = (row: VmCloudServerVO) => {
   useRoute.push({
     path: useRoute.currentRoute.value.path.replace(
-      "/list",
-      `/detail/${row.id}`
+        "/list",
+        `/detail/${row.id}`
     ),
   });
 };
@@ -260,7 +273,7 @@ const openRenew = (row: VmCloudServerVO) => {
 };
 const batchOpenRenew = () => {
   if (
-    selectedRowData.value.find((item) => item.instanceChargeType === "PrePaid")
+      selectedRowData.value.find((item) => item.instanceChargeType === "PrePaid")
   ) {
     renewRef.value?.open(selectedRowData.value);
   } else {
@@ -306,22 +319,22 @@ const checkVmToolsStatus = (vm: VmCloudServerVO) => {
  */
 const powerOn = (row: VmCloudServerVO) => {
   ElMessageBox.confirm(
-    t("vm_cloud_server.message_box.confirm_power_on", "确认启动"),
-    t("commons.message_box.prompt", "提示"),
-    {
-      confirmButtonText: t("commons.message_box.confirm", "确认"),
-      cancelButtonText: t("commons.btn.cancel", "取消"),
-      type: "warning",
-    }
+      t("vm_cloud_server.message_box.confirm_power_on", "确认启动"),
+      t("commons.message_box.prompt", "提示"),
+      {
+        confirmButtonText: t("commons.message_box.confirm", "确认"),
+        cancelButtonText: t("commons.btn.cancel", "取消"),
+        type: "warning",
+      }
   ).then(() => {
     VmCloudServerApi.powerOn(row.id as string)
-      .then((res) => {
-        ElMessage.success(t("commons.msg.op_success"));
-        refresh();
-      })
-      .catch((err) => {
-        ElMessage.error(err.response.data.message);
-      });
+        .then((res) => {
+          ElMessage.success(t("commons.msg.op_success"));
+          refresh();
+        })
+        .catch((err) => {
+          ElMessage.error(err.response.data.message);
+        });
   });
 };
 //关机
@@ -330,8 +343,8 @@ const shutdown = (row: VmCloudServerVO) => {
   let powerOff = false;
   if (!checkVmToolsStatus(row)) {
     label = t(
-      "vm_cloud_server.message_box.check_vm_tools_status_confirm_shutdown",
-      "当前云主机未安装VmTools或VmTools未运行，无法软关机，若继续操作则关闭电源，是否继续？"
+        "vm_cloud_server.message_box.check_vm_tools_status_confirm_shutdown",
+        "当前云主机未安装VmTools或VmTools未运行，无法软关机，若继续操作则关闭电源，是否继续？"
     );
     powerOff = true;
   }
@@ -342,65 +355,65 @@ const shutdown = (row: VmCloudServerVO) => {
   }).then(() => {
     if (powerOff) {
       VmCloudServerApi.powerOff(row.id as string)
-        .then((res) => {
-          ElMessage.success(t("commons.msg.op_success"));
-          refresh();
-        })
-        .catch((err) => {
-          ElMessage.error(err.response.data.message);
-        });
+          .then((res) => {
+            ElMessage.success(t("commons.msg.op_success"));
+            refresh();
+          })
+          .catch((err) => {
+            ElMessage.error(err.response.data.message);
+          });
     } else {
       VmCloudServerApi.shutdownInstance(row.id as string)
-        .then((res) => {
-          ElMessage.success(t("commons.msg.op_success"));
-          refresh();
-        })
-        .catch((err) => {
-          ElMessage.error(err.response.data.message);
-        });
+          .then((res) => {
+            ElMessage.success(t("commons.msg.op_success"));
+            refresh();
+          })
+          .catch((err) => {
+            ElMessage.error(err.response.data.message);
+          });
     }
   });
 };
 //关闭电源
 const powerOff = (row: VmCloudServerVO) => {
   ElMessageBox.confirm(
-    t("vm_cloud_server.message_box.confirm_power_off", "确认关闭电源"),
-    t("commons.message_box.prompt", "提示"),
-    {
-      confirmButtonText: t("commons.message_box.confirm", "确认"),
-      cancelButtonText: t("commons.btn.cancel", "取消"),
-      type: "warning",
-    }
+      t("vm_cloud_server.message_box.confirm_power_off", "确认关闭电源"),
+      t("commons.message_box.prompt", "提示"),
+      {
+        confirmButtonText: t("commons.message_box.confirm", "确认"),
+        cancelButtonText: t("commons.btn.cancel", "取消"),
+        type: "warning",
+      }
   ).then(() => {
     VmCloudServerApi.powerOff(row.id as string)
-      .then(() => {
-        ElMessage.success(t("commons.msg.op_success"));
-        refresh();
-      })
-      .catch((err) => {
-        ElMessage.error(err.response.data.message);
-      });
+        .then(() => {
+          ElMessage.success(t("commons.msg.op_success"));
+          refresh();
+        })
+        .catch((err) => {
+          ElMessage.error(err.response.data.message);
+        });
   });
 };
 //重启
 const reboot = (row: VmCloudServerVO) => {
   ElMessageBox.confirm(
-    t("vm_cloud_server.message_box.confirm_reboot", "确认重启"),
-    t("commons.message_box.prompt", "提示"),
-    {
-      confirmButtonText: t("commons.message_box.confirm", "确认"),
-      cancelButtonText: t("commons.btn.cancel", "取消"),
-      type: "warning",
-    }
+      t("vm_cloud_server.message_box.confirm_reboot", "确认重启"),
+      t("commons.message_box.prompt", "提示"),
+      {
+        confirmButtonText: t("commons.message_box.confirm", "确认"),
+        cancelButtonText: t("commons.btn.cancel", "取消"),
+        type: "warning",
+      }
   ).then(() => {
     VmCloudServerApi.reboot(row.id as string)
-      .then(() => {
-        ElMessage.success(t("commons.msg.op_success"));
-        refresh();
-      })
-      .catch((err) => {
-        ElMessage.error(err.response.data.message);
-      });
+        .then(() => {
+          ElMessage.success(t("commons.msg.op_success"));
+          refresh();
+        })
+        .catch((err) => {
+          ElMessage.error(err.response.data.message);
+        });
   });
 };
 
@@ -413,13 +426,13 @@ const deleteInstance = async (row: VmCloudServerVO) => {
   await getRecycleBinSetting();
 
   const message = isRecycleBinOpened.value
-    ? t(
-        "vm_cloud_server.message_box.confirm_recycle",
-        "回收站已开启，云主机将关机并放入回收站中"
+      ? t(
+          "vm_cloud_server.message_box.confirm_recycle",
+          "回收站已开启，云主机将关机并放入回收站中"
       )
-    : t(
-        "vm_cloud_server.message_box.confirm_to_delete",
-        "回收站已关闭，云主机将立即删除"
+      : t(
+          "vm_cloud_server.message_box.confirm_to_delete",
+          "回收站已关闭，云主机将立即删除"
       );
   ElMessageBox.confirm(message, t("commons.message_box.prompt", "提示"), {
     confirmButtonText: t("commons.message_box.confirm", "确认"),
@@ -428,22 +441,22 @@ const deleteInstance = async (row: VmCloudServerVO) => {
   }).then(() => {
     if (isRecycleBinOpened.value) {
       VmCloudServerApi.recycleInstance(row.id as string)
-        .then(() => {
-          ElMessage.success(t("commons.msg.op_success"));
-          refresh();
-        })
-        .catch((err) => {
-          ElMessage.error(err.response.data.message);
-        });
+          .then(() => {
+            ElMessage.success(t("commons.msg.op_success"));
+            refresh();
+          })
+          .catch((err) => {
+            ElMessage.error(err.response.data.message);
+          });
     } else {
       VmCloudServerApi.deleteInstance(row.id as string)
-        .then(() => {
-          ElMessage.success(t("commons.msg.op_success"));
-          refresh();
-        })
-        .catch((err) => {
-          ElMessage.error(err.response.data.message);
-        });
+          .then(() => {
+            ElMessage.success(t("commons.msg.op_success"));
+            refresh();
+          })
+          .catch((err) => {
+            ElMessage.error(err.response.data.message);
+          });
     }
   });
 };
@@ -451,8 +464,8 @@ const deleteInstance = async (row: VmCloudServerVO) => {
 // 删除创建失败机器的记录，只删除数据库记录，不调用云平台接口
 const deleteFailedRecord = (cloudServerId: string) => {
   const message = t(
-    "vm_cloud_server.message_box.confirm_delete_record",
-    "确认删除失败记录？"
+      "vm_cloud_server.message_box.confirm_delete_record",
+      "确认删除失败记录？"
   );
   ElMessageBox.confirm(message, t("commons.message_box.prompt", "提示"), {
     confirmButtonText: t("commons.message_box.confirm", "确认"),
@@ -460,13 +473,13 @@ const deleteFailedRecord = (cloudServerId: string) => {
     type: "warning",
   }).then(() => {
     VmCloudServerApi.deleteFailedRecord(cloudServerId)
-      .then(() => {
-        ElMessage.success(t("commons.msg.op_success"));
-        refresh();
-      })
-      .catch((err) => {
-        ElMessage.error(err.response.data.message);
-      });
+        .then(() => {
+          ElMessage.success(t("commons.msg.op_success"));
+          refresh();
+        })
+        .catch((err) => {
+          ElMessage.error(err.response.data.message);
+        });
   });
 };
 
@@ -481,26 +494,26 @@ const batchOperate = (operate: string) => {
     instanceOperateMap.get(operate),
   ]);
   if (
-    operate.toUpperCase() === "DELETED" ||
-    operate.toUpperCase() === "RECYCLE_SERVER"
+      operate.toUpperCase() === "DELETED" ||
+      operate.toUpperCase() === "RECYCLE_SERVER"
   ) {
     message = isRecycleBinOpened.value
-      ? t(
-          "vm_cloud_server.message_box.confirm_recycle",
-          "回收站已开启，云主机将关机并放入回收站中"
+        ? t(
+            "vm_cloud_server.message_box.confirm_recycle",
+            "回收站已开启，云主机将关机并放入回收站中"
         )
-      : t(
-          "vm_cloud_server.message_box.confirm_to_delete",
-          "回收站已关闭，云主机将立即删除"
+        : t(
+            "vm_cloud_server.message_box.confirm_to_delete",
+            "回收站已关闭，云主机将立即删除"
         );
     if (
-      selectedRowData.value.every(
-        (vmCloudServer) => vmCloudServer.instanceStatus === "Failed"
-      )
+        selectedRowData.value.every(
+            (vmCloudServer) => vmCloudServer.instanceStatus === "Failed"
+        )
     ) {
       message = t(
-        "vm_cloud_server.message_box.confirm_batch_delete_record",
-        "确认批量删除失败记录"
+          "vm_cloud_server.message_box.confirm_batch_delete_record",
+          "确认批量删除失败记录"
       );
     }
   }
@@ -510,13 +523,13 @@ const batchOperate = (operate: string) => {
     type: "warning",
   }).then(() => {
     VmCloudServerApi.batchOperate(_.map(selectedRowData.value, "id"), operate)
-      .then(() => {
-        ElMessage.success(t("commons.msg.op_success"));
-        refresh();
-      })
-      .catch((err) => {
-        ElMessage.error(err.response.data.message);
-      });
+        .then(() => {
+          ElMessage.success(t("commons.msg.op_success"));
+          refresh();
+        })
+        .catch((err) => {
+          ElMessage.error(err.response.data.message);
+        });
   });
 };
 /**
@@ -537,6 +550,14 @@ const showGrantDialog = () => {
   grantDialogVisible.value = true;
 };
 
+const showConfigDialog = () => {
+  dialogVisible.value = true;
+  VmCloudServerApi.groupsInfo().then((res) => {
+    groupsTableData.value = res.data
+  })
+
+}
+
 //删除
 const deleteBatch = async () => {
   await getRecycleBinSetting();
@@ -552,11 +573,11 @@ const deleteBatch = async () => {
  */
 const disableBatch = computed<boolean>(() => {
   return selectedRowData.value.length === 0
-    ? true
-    : selectedRowData.value.length > 0 &&
-        selectedRowData.value.some(
+      ? true
+      : selectedRowData.value.length > 0 &&
+      selectedRowData.value.some(
           (row) => row.instanceStatus === "ToBeRecycled"
-        );
+      );
 });
 const createAction = ref<Array<ButtonActionType>>([
   // new ButtonAction(
@@ -627,70 +648,70 @@ const tableConfig = ref<TableConfig>({
   paginationConfig: new PaginationConfig(),
   tableOperations: new TableOperations([
     TableOperations.buildButtons().newInstance(
-      t("vm_cloud_server.btn.power_off", "关闭电源"),
-      "primary",
-      powerOff,
-      undefined,
-      (row: { instanceStatus: string }) => {
-        return row.instanceStatus !== "Running";
-      },
-      permissionStore.hasPermission("[vm-service]CLOUD_SERVER:STOP")
+        t("vm_cloud_server.btn.power_off", "关闭电源"),
+        "primary",
+        powerOff,
+        undefined,
+        (row: { instanceStatus: string }) => {
+          return row.instanceStatus !== "Running";
+        },
+        permissionStore.hasPermission("[vm-service]CLOUD_SERVER:STOP")
     ),
     TableOperations.buildButtons().newInstance(
-      t("vm_cloud_server.btn.reboot", "重启"),
-      "primary",
-      reboot,
-      undefined,
-      (row: { instanceStatus: string }) => {
-        return row.instanceStatus !== "Running";
-      },
-      permissionStore.hasPermission("[vm-service]CLOUD_SERVER:RESTART")
+        t("vm_cloud_server.btn.reboot", "重启"),
+        "primary",
+        reboot,
+        undefined,
+        (row: { instanceStatus: string }) => {
+          return row.instanceStatus !== "Running";
+        },
+        permissionStore.hasPermission("[vm-service]CLOUD_SERVER:RESTART")
     ),
     TableOperations.buildButtons().newInstance(
-      t("commons.btn.delete", "删除"),
-      "primary",
-      deleteInstance,
-      undefined,
-      (row: { instanceStatus: string }) => {
-        return (
-          row.instanceStatus.toUpperCase() === "ToBeRecycled".toUpperCase() ||
-          row.instanceStatus.toUpperCase() === "Deleted".toUpperCase() ||
-          (row.instanceStatus.toUpperCase() !== "Running".toUpperCase() &&
-            row.instanceStatus.toUpperCase().indexOf("ING") > -1)
-        );
-      },
-      permissionStore.hasPermission("[vm-service]CLOUD_SERVER:DELETE"),
-      "#F54A45"
+        t("commons.btn.delete", "删除"),
+        "primary",
+        deleteInstance,
+        undefined,
+        (row: { instanceStatus: string }) => {
+          return (
+              row.instanceStatus.toUpperCase() === "ToBeRecycled".toUpperCase() ||
+              row.instanceStatus.toUpperCase() === "Deleted".toUpperCase() ||
+              (row.instanceStatus.toUpperCase() !== "Running".toUpperCase() &&
+                  row.instanceStatus.toUpperCase().indexOf("ING") > -1)
+          );
+        },
+        permissionStore.hasPermission("[vm-service]CLOUD_SERVER:DELETE"),
+        "#F54A45"
     ),
     TableOperations.buildButtons().newInstance(
-      t("vm_cloud_disk.btn.create", "添加磁盘"),
-      "primary",
-      createDisk,
-      undefined,
-      (row: { instanceStatus: string }) => {
-        return (
-          row.instanceStatus.toUpperCase() === "ToBeRecycled".toUpperCase() ||
-          row.instanceStatus.toUpperCase() === "Deleted".toUpperCase() ||
-          (row.instanceStatus.toUpperCase() !== "Running".toUpperCase() &&
-            row.instanceStatus.toUpperCase().indexOf("ING") > -1)
-        );
-      },
-      permissionStore.hasPermission("[vm-service]CLOUD_DISK:CREATE")
+        t("vm_cloud_disk.btn.create", "添加磁盘"),
+        "primary",
+        createDisk,
+        undefined,
+        (row: { instanceStatus: string }) => {
+          return (
+              row.instanceStatus.toUpperCase() === "ToBeRecycled".toUpperCase() ||
+              row.instanceStatus.toUpperCase() === "Deleted".toUpperCase() ||
+              (row.instanceStatus.toUpperCase() !== "Running".toUpperCase() &&
+                  row.instanceStatus.toUpperCase().indexOf("ING") > -1)
+          );
+        },
+        permissionStore.hasPermission("[vm-service]CLOUD_DISK:CREATE")
     ),
     TableOperations.buildButtons().newInstance(
-      t("vm_cloud_server.btn.change_config", "配置变更"),
-      "primary",
-      changeVmConfig,
-      undefined,
-      (row: { instanceStatus: string }) => {
-        return (
-          row.instanceStatus === "ToBeRecycled" ||
-          row.instanceStatus === "Deleted" ||
-          (row.instanceStatus.toLowerCase() != "running" &&
-            row.instanceStatus.toLowerCase().indexOf("ing") > -1)
-        );
-      },
-      permissionStore.hasPermission("[vm-service]CLOUD_SERVER:RESIZE")
+        t("vm_cloud_server.btn.change_config", "配置变更"),
+        "primary",
+        changeVmConfig,
+        undefined,
+        (row: { instanceStatus: string }) => {
+          return (
+              row.instanceStatus === "ToBeRecycled" ||
+              row.instanceStatus === "Deleted" ||
+              (row.instanceStatus.toLowerCase() != "running" &&
+                  row.instanceStatus.toLowerCase().indexOf("ing") > -1)
+          );
+        },
+        permissionStore.hasPermission("[vm-service]CLOUD_SERVER:RESIZE")
     ),
   ]),
 });
@@ -707,11 +728,11 @@ const getExpiredTimeMessage = (expiredTime: string) => {
     const difference = expired.getTime() - currentDate.getTime();
     if (difference < 1000 * 60 * 60 * 24 * 15) {
       return (
-        "剩余" +
-        Math.ceil(
-          (expired.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)
-        ) +
-        "天"
+          "剩余" +
+          Math.ceil(
+              (expired.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)
+          ) +
+          "天"
       );
     }
   }
@@ -736,9 +757,9 @@ const buttons = ref([
     icon: "",
     click: (row: VmDefaultVO) => {
       VmCloudServerApi.setVmDefault(row)
-      .then(res =>{
-        if(res.data) refresh()
-      })
+          .then(res => {
+            if (res.data) refresh()
+          })
     },
     show: permissionStore.hasPermission("[vm-service]CLOUD_SERVER:START"),
     disabled: (row: { isDefault: boolean }) => {
@@ -837,9 +858,208 @@ const exportData = () => {
   const tableParams = TableSearch.toSearchParams(condition);
   VmCloudServerApi.exportData(tableParams, loading);
 };
+const groupsHandleDelete = (index, id) => {
+  VmCloudServerApi.deleteGroups({"id": id}).then(res => {
+    if (res.data) {
+      ElMessage({
+        message: '删除成功',
+        type: 'success'
+      })
+      VmCloudServerApi.groupsInfo().then((res) => {
+        groupsTableData.value = res.data
+      })
+    } else {
+      ElMessage({
+        message: '删除失败',
+        type: 'error'
+      })
+    }
+  })
+}
+const pushCreate = () => {
+  pushCreateDialogVisible.value = true
+  VmCloudServerApi.pusherList().then((res) => {
+    pusherOptions.value = res.data
+  })
+}
+
+const pusherCreateCancel = () =>{
+  pushCreateDialogVisible.value = false
+  pusher.value = ""
+  groupName.value = ""
+}
+
+const pusherCreateConfirm = () => {
+
+  VmCloudServerApi.saveGroups({"groupName": groupName.value,"pusherId":pusher.value}).then(res => {
+    if (res.data) {
+      ElMessage({
+        message: '创建成功',
+        type: 'success'
+      })
+      VmCloudServerApi.groupsInfo().then((res) => {
+        groupsTableData.value = res.data
+      })
+      pushCreateDialogVisible.value = false
+    } else {
+      ElMessage({
+        message: '创建失败',
+        type: 'error'
+      })
+    }
+  })
+}
+const configGroup = () =>{
+  if(groupsMultipleSelection.value.length > 0){
+    pushGroupsDialogVisible.value = true;
+    VmCloudServerApi.groupList().then((res) => {
+      groupsOptions.value = res.data
+    })
+  }else {
+    ElMessage({
+      message: '请至少选择一条记录',
+      type: 'warning'
+    })
+  }
+}
+
+const groupsHandleSelectionChange = (val) =>{
+  groupsMultipleSelection.value = val;
+}
+
+const groupConfigCancel = () =>{
+  pushGroupsDialogVisible.value = false
+  groupsSet.value = ""
+}
+const groupConfigConfirm = () =>{
+  pushGroupsDialogVisible.value = false
+
+for (let i in groupsMultipleSelection.value){
+  groupsMultipleSelection.value[i].groups = groupsSet.value
+}
+
+  VmCloudServerApi.groupSave(groupsMultipleSelection.value).then((res) => {
+    if(res.data){
+      ElMessage({
+        message: '设置成功',
+        type: 'success'
+      })
+      groupsSet.value = ""
+      pushGroupsDialogVisible.value = false
+      VmCloudServerApi.listpull(
+          {
+            currentPage: tableConfig.value.paginationConfig.currentPage,
+            pageSize: tableConfig.value.paginationConfig.pageSize
+          },
+          tableLoading
+      ).then((res) => {
+        tableData.value = res.data.records;
+
+        tableConfig.value.paginationConfig?.setTotal(
+            res.data.total,
+            tableConfig.value.paginationConfig
+        );
+        tableConfig.value.paginationConfig?.setCurrentPage(
+            res.data.current,
+            tableConfig.value.paginationConfig
+        );
+      });
+    }else{
+      ElMessage({
+        message: '创建失败',
+        type: 'error'
+      })
+    }
+  })
+}
 </script>
 <template>
   <div>
+    <el-dialog
+        title="推流端组设置"
+        v-model="pushGroupsDialogVisible"
+        width="40%">
+      <!--        :before-close="handleClose">-->
+      <div class="demo-input-suffix">
+        <el-select v-model="groupsSet" style="margin-top:20px" placeholder="请选择组">
+          <el-option
+              v-for="item in groupsOptions"
+              :key="item.id"
+              :label="item.groupName"
+              :value="item.id">
+          </el-option>
+        </el-select>
+      </div>
+      <div slot="footer" class="dialog-footer" style="margin-top:20px;">
+        <el-button @click="groupConfigCancel">取 消</el-button>
+        <el-button type="primary" @click="groupConfigConfirm">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog
+        title="推流端组创建"
+        v-model="pushCreateDialogVisible"
+        width="40%">
+      <!--        :before-close="handleClose">-->
+      <div class="demo-input-suffix">
+        <span>组名：</span>
+        <el-input
+            placeholder="请输入组名"
+            prefix-icon="el-icon-search"
+            style="margin-top:20px"
+            v-model="groupName">
+        </el-input>
+        <div style="margin-top:20px;">推流id：</div>
+        <el-select v-model="pusher" style="margin-top:20px" placeholder="请选择推流用户id">
+          <el-option
+              v-for="item in pusherOptions"
+              :key="item.userId"
+              :label="item.userName"
+              :value="item.userName">
+          </el-option>
+        </el-select>
+      </div>
+      <div slot="footer" class="dialog-footer" style="margin-top:20px;">
+        <el-button @click="pusherCreateCancel">取 消</el-button>
+        <el-button type="primary" @click="pusherCreateConfirm">确 定</el-button>
+       </div>
+    </el-dialog>
+    <el-dialog
+        title="推流端组配置"
+        v-model="dialogVisible"
+        width="80%">
+      <!--        :before-close="handleClose">-->
+      <el-button type="success" @click="pushCreate">新建组</el-button>
+      <el-table
+          :data="groupsTableData"
+          style="width: 100%">
+        <el-table-column
+            label="id"
+            prop="id"
+            v-if="false"
+            width="180">
+        </el-table-column>
+        <el-table-column
+            label="组名"
+            prop="groupName"
+            width="180">
+        </el-table-column>
+        <el-table-column
+            label="推流账号"
+            prop="pusherId"
+            width="180">
+        </el-table-column>
+        <el-table-column label="操作">
+          <template #default="scope">
+            <el-button
+                size="mini"
+                type="danger"
+                @click="groupsHandleDelete(scope.$index, scope.row.id)">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
+
     <el-button type="primary" @click="search(new TableSearch())">
       <template #icon>
         <!-- 刷新图标 (自定义 SVG) -->
@@ -855,151 +1075,170 @@ const exportData = () => {
         </svg>
       </template>
     </el-button>
+    <el-button type="primary" @click="showConfigDialog">推流端配置</el-button>
+    <el-button type="primary" @click="configGroup">设置组</el-button>
   </div>
   <ce-table
-    localKey="vmCloudServerTable"
-    v-loading="tableLoading"
-    :data="tableData"
-    :tableConfig="tableConfig"
-    :show-selected-count="false"
-    @selection-change="handleSelectionChange"
-    @clearCondition="clearCondition"
-    row-key="id"
-    height="100%"
-    ref="table"
+      localKey="vmCloudServerTable"
+      v-loading="tableLoading"
+      :data="tableData"
+      :tableConfig="tableConfig"
+      :show-selected-count="false"
+      @selection-change="groupsHandleSelectionChange"
+      @clearCondition="clearCondition"
+      row-key="id"
+      height="100%"
+      ref="table"
   >
     <template #toolbar>
-      <ButtonToolBar :actions="createAction || []" :ellipsis="4" />
-      <ButtonToolBar :actions="moreActions || []" :ellipsis="2" />
+      <ButtonToolBar :actions="createAction || []" :ellipsis="4"/>
+      <ButtonToolBar :actions="moreActions || []" :ellipsis="2"/>
     </template>
-<!--    <el-table-column type="selection" />-->
+    <el-table-column type="selection"/>
     <el-table-column
-      prop="isOnline"
-      column-key="isOnline"
-      label="是否在线"
+        prop="isOnline"
+        column-key="isOnline"
+        label="是否在线"
 
-      min-width="100px"
+        min-width="100px"
     >
       <template #default="scope">
         <div style="display: flex;margin-left: 25%">
-          <div v-if="scope.row.isOnline" style="background-color: greenyellow;width: 10px;height: 10px;border: 1px solid black"></div>
+          <div v-if="scope.row.isOnline"
+               style="background-color: greenyellow;width: 10px;height: 10px;border: 1px solid black"></div>
           <div v-else style="background-color: red;width: 10px;height: 10px;border: 1px solid black"></div>
         </div>
       </template>
     </el-table-column>
     <el-table-column
-        prop="belong"
-        column-key="belong"
-        label="推流账号"
+        prop="machineCode"
+        column-key="machineCode"
+        label="machinecode"
+        min-width="200px"
+    ></el-table-column>
+    <el-table-column
+        prop="groups"
+        column-key="groups"
+        label="分组"
         min-width="120px"
+    >
+      <template #default="scope">
+
+      </template>
+
+    </el-table-column>
+    <el-table-column
+        prop="sendIp"
+        column-key="sendIp"
+        label="拉流端ip"
+
+        min-width="200px"
     ></el-table-column>
     <el-table-column
-      prop="sendIp"
-      column-key="sendIp"
-      label="推流端ip"
-
-      min-width="200px"
+        prop="sendLocation"
+        column-key="sendLocation"
+        label="拉流端位置"
+        min-width="200px"
     ></el-table-column>
     <el-table-column
-            prop="sendLocation"
-            column-key="sendLocation"
-            label="推流端位置"
-
-            min-width="200px"
+        prop="sendOperator"
+        column-key="sendOperator"
+        label="拉流端服务商"
+        min-width="200px"
     ></el-table-column>
     <el-table-column
-            prop="sendOperator"
-            column-key="sendOperator"
-            label="推流端服务商"
+        prop="receiveIp"
+        column-key="receiveIp"
+        label="中继端ip"
 
-            min-width="200px"
-    ></el-table-column>
-    <el-table-column
-      prop="receiveIp"
-      column-key="receiveIp"
-      label="中转端ip"
-
-      min-width="100px"
+        min-width="100px"
     ></el-table-column>
 
     <el-table-column
-      prop="receiveServer"
-      column-key="receiveServer"
-      label="中转端服务器实例名称"
+        prop="receiveServer"
+        column-key="receiveServer"
+        label="中继端服务器实例名称"
 
-      min-width="200px"
+        min-width="200px"
     ></el-table-column>
     <el-table-column
-            prop="receiveStatus"
-            column-key="receiveStatus"
-            label="服务器状态"
-            :filters="instanceStatusForTableSelect"
-            :filter-multiple="false"
-            min-width="120px"
+        prop="receiveStatus"
+        column-key="receiveStatus"
+        label="服务器状态"
+        :filters="instanceStatusForTableSelect"
+        :filter-multiple="false"
+        min-width="120px"
     >
       <template #default="scope">
         <div v-if="scope.row.receiveStatus != '-'" style="display: flex; align-items: center">
           <VmServerStatusIcon
-                  :status="scope.row.receiveStatus"
+              :status="scope.row.receiveStatus"
           ></VmServerStatusIcon>
           <span style="margin-left: 7px"
           >{{ InstanceStatusUtils.getStatusName(scope.row.receiveStatus) }}
           </span>
         </div>
         <div v-else>
-          {{scope.row.receiveStatus}}
+          {{ scope.row.receiveStatus }}
         </div>
       </template>
     </el-table-column>
     <el-table-column
-      prop="createTime"
-      column-key="createTime"
-      sortable
-      label="创建时间"
-      min-width="180px"
+        prop="createTime"
+        column-key="createTime"
+        sortable
+        label="创建时间"
+        min-width="180px"
     ></el-table-column>
 
-<!--    <fu-table-operations-->
-<!--      :ellipsis="2"-->
-<!--      :columns="columns"-->
-<!--      :buttons="buttons"-->
-<!--      :label="$t('commons.operation')"-->
-<!--      ="right"-->
-<!--    />-->
+    <el-table-column
+        prop="belong"
+        column-key="belong"
+
+        label="推流端账号"
+        min-width="120px"
+    ></el-table-column>
+    <!--    <fu-table-operations-->
+    <!--      :ellipsis="2"-->
+    <!--      :columns="columns"-->
+    <!--      :buttons="buttons"-->
+    <!--      :label="$t('commons.operation')"-->
+    <!--      ="right"-->
+    <!--    />-->
 
     <template #buttons>
       <!-- 导出 -->
       <el-button
-        :loading="loading"
-        @click="exportData('xlsx')"
-        style="width: 32px"
+          :loading="loading"
+          @click="exportData('xlsx')"
+          style="width: 32px"
       >
-        <ce-icon v-if="!loading" size="16" code="icon_bottom-align_outlined" />
+        <ce-icon v-if="!loading" size="16" code="icon_bottom-align_outlined"/>
         <template #loading>
           <ce-icon
-            class="is-loading"
-            style="margin-left: 6px"
-            size="16"
-            code="Loading"
+              class="is-loading"
+              style="margin-left: 6px"
+              size="16"
+              code="Loading"
           />
         </template>
       </el-button>
-      <CeTableColumnSelect :columns="columns" />
+      <CeTableColumnSelect :columns="columns"/>
     </template>
   </ce-table>
 
   <!-- 授权页面弹出框 -->
   <el-dialog
-    v-model="grantDialogVisible"
-    :title="$t('commons.grant')"
-    width="35%"
-    destroy-on-close
+      v-model="grantDialogVisible"
+      :title="$t('commons.grant')"
+      width="35%"
+      destroy-on-close
   >
     <Grant
-      :ids="selectedServerIds || []"
-      resource-type="vm"
-      v-model:dialogVisible="grantDialogVisible"
-      @refresh="refresh"
+        :ids="selectedServerIds || []"
+        resource-type="vm"
+        v-model:dialogVisible="grantDialogVisible"
+        @refresh="refresh"
     />
   </el-dialog>
   <AddDisk ref="addDiskRef"></AddDisk>
@@ -1010,16 +1249,20 @@ const exportData = () => {
 .name-span-class {
   color: var(--el-color-primary);
 }
+
 .name-span-class:hover {
   cursor: pointer;
 }
+
 .highlight {
   color: var(--el-color-primary);
 }
+
 .role_display {
   height: 24px;
   line-height: 24px;
   display: flex;
+
   .role_numbers {
     cursor: pointer;
     margin-left: 8px;
@@ -1029,6 +1272,7 @@ const exportData = () => {
     font-size: 14px;
     background-color: rgba(31, 35, 41, 0.1);
   }
+
   .role_numbers:hover {
     background-color: #ebf1ff;
     color: #3370ff;

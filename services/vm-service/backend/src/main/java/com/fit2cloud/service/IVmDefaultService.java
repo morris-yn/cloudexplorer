@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.fit2cloud.base.entity.VmCloudDisk;
 import com.fit2cloud.controller.request.vm.CreateServerRequest;
-import com.fit2cloud.dao.entity.DefaultVmConfig;
-import com.fit2cloud.dao.entity.LiveUser;
-import com.fit2cloud.dao.entity.PullRequest;
-import com.fit2cloud.dao.entity.UserValidtime;
+import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.dto.JobRecordDTO;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -49,6 +46,8 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
 
     IPage<LiveUser> getInfoList(CreateServerRequest request);
 
+    IPage<LiveUser> pullInfoList(CreateServerRequest request);
+
     JSONArray getEquipmentList();
 
     JSONObject getEquipmentDetail(String uid);
@@ -62,4 +61,16 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
     JSONObject getLiveManageInfo(String uid);
 
     Boolean logs(String loginfo);
+
+    List<GroupsInfo> getGroupsInfo();
+
+    Boolean deleteGroups(String id);
+
+    List<UserValidtime> pusherList();
+
+    Boolean saveGroup(GroupsInfo groupsInfo);
+
+    List<GroupsInfo> groupList();
+
+    Boolean groupSave(List<JSONObject> info);
 }

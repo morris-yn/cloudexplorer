@@ -23,6 +23,8 @@ public class FilterConfig {
 
     private final LiveGoodsMapper liveGoodsMapper;
 
+    private final String exclude = "/vm-service/goods/pullheart";
+
     @Autowired
     public FilterConfig(LiveGoodsMapper liveGoodsMapper) {
         this.liveGoodsMapper = liveGoodsMapper;
@@ -45,6 +47,11 @@ public class FilterConfig {
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
                              FilterChain chain) throws IOException, ServletException {
+            String path = ((HttpServletRequest) request).getRequestURI();
+            if(path.matches(exclude)){
+                 chain.doFilter(request, response);
+                 return;
+            }
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             String token = httpRequest.getHeader("Authorization");
             if(token == null){

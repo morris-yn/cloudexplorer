@@ -2,16 +2,16 @@ import { exportExcel, get, post, put } from "@commons/request";
 import type Result from "@commons/request/Result";
 import type { Page } from "@commons/request/Result";
 import type {
-  VmDefaultVO,
-  VmCloudServerVO,
-  onlineInfo,
-  ListVmCloudServerRequest,
-  CreateServerRequest,
-  CloudServerJobRecord,
-  PerfMonitorData,
-  GetPerfMonitorRequest,
-  ChangeServerConfigRequest,
-  GrantRequest,
+    VmDefaultVO,
+    VmCloudServerVO,
+    onlineInfo,
+    ListVmCloudServerRequest,
+    CreateServerRequest,
+    CloudServerJobRecord,
+    PerfMonitorData,
+    GetPerfMonitorRequest,
+    ChangeServerConfigRequest,
+    GrantRequest, groupsInfo,
 } from "./type";
 import type { Ref } from "vue";
 import type { FormViewObject } from "@commons/components/ce-form/type";
@@ -51,6 +51,87 @@ export function listOnline(
     loading?: Ref<boolean>
 ): Promise<Result<Page<onlineInfo>>> {
   return get("/api/default/infoList", req, loading);
+}
+
+/**
+ * 组配置
+ * @param req
+ * @param loading
+ */
+export function groupSave(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Boolean>> {
+    return post("/api/default/groupSave",null, req, loading);
+}
+
+/**
+ * 插入组信息
+ * @param req
+ * @param loading
+ */
+export function groupList(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Boolean>> {
+    return get("/api/default/groupList", req, loading);
+}
+/**
+ * 插入组信息
+ * @param req
+ * @param loading
+ */
+export function saveGroups(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Boolean>> {
+    return post("/api/default/saveGroup",null, req, loading);
+}
+/**
+ * 拉流列表
+ * @param req
+ * @param loading
+ */
+export function listpull(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Page<onlineInfo>>> {
+    return get("/api/default/pullInfoList", req, loading);
+}
+/**
+ * 推流人列表
+ * @param req
+ * @param loading
+ */
+export function pusherList(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Page<onlineInfo>>> {
+    return get("/api/default/pusherList", req, loading);
+}
+
+/**
+ * 组删除
+ * @param req
+ * @param loading
+ */
+export function deleteGroups(
+    req: string,
+    loading?: Ref<boolean>
+): Promise<Result<boolean>> {
+    return get("/api/default/deleteGroups", req, loading);
+}
+
+/**
+ * 组信息
+ * @param req
+ * @param loading
+ */
+export function groupsInfo(
+    req: ListVmCloudServerRequest,
+    loading?: Ref<boolean>
+): Promise<Result<Page<groupsInfo>>> {
+    return get("/api/default/getGroupsInfo", req, loading);
 }
 
 /**
@@ -373,6 +454,13 @@ const VmCloudServerApi = {
   shutdownInstance,
   powerOn,
   reboot,
+  listpull,
+    pusherList,
+    deleteGroups,
+    saveGroups,
+    groupList,
+    groupSave,
+  groupsInfo,
   powerOff,
   recycleInstance,
   deleteInstance,
