@@ -95,7 +95,7 @@ public class GoodsController {
     @PostMapping("/pullheart")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> pullheart(@RequestBody PullRequest request , HttpServletRequest http) {
-        return ResultHolder.success(iVmDefaultService.pullheart(request,http) ? "rtmp://120.26.203.216/live/user_i-bp10gt7yws743hdla1s5" : "账号已限制");
+        return ResultHolder.success(iVmDefaultService.pullheart(request,http));
     }
 
     @Operation(summary = "", description = "开播")
@@ -103,15 +103,33 @@ public class GoodsController {
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> startVm() {
         Map map = iVmDefaultService.startVm();
+        return ResultHolder.of(map.get("code"),map.get("msg"),map.get("data"));
+    }
+
+    @Operation(summary = "", description = "关闭直播")
+    @PostMapping("/stopVm")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> stopVm(@RequestBody Map<String, Object> body) {
+        String vmId = (String) body.get("vmId");
+        Map map = iVmDefaultService.stopVm(vmId);
         return ResultHolder.of(map.get("code"),map.get("msg"),null);
     }
 
-    @Operation(summary = "", description = "重启服务器")
+    @Operation(summary = "", description = "重启中继端")
     @PostMapping("/restartVm")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Object> restartVm() {
-        Map map = iVmDefaultService.startVm();
+    public ResultHolder<Object> restartVm(@RequestBody Map<String, Object> body) {
+         String vmId = (String) body.get("vmId");
+         Map map = iVmDefaultService.restartVm(vmId);
         return ResultHolder.of(map.get("code"),map.get("msg"),null);
+    }
+
+    @Operation(summary = "", description = "服务器开通检查接口")
+    @PostMapping("/ping")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Boolean> ping(@RequestBody Map<String, Object> body) {
+        String ip = (String) body.get("ip");
+        return ResultHolder.of(200,"",iVmDefaultService.ping(ip));
     }
 
 
@@ -187,10 +205,11 @@ public class GoodsController {
 
 
     @Operation(summary = "", description = "前端日志记录")
-    @GetMapping("/logs")
+    @PostMapping("/logs")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
-    public ResultHolder<Object> logs(Object info) {
+    public ResultHolder<Object> logs(@RequestBody HashMap req) {
         try {
+            Object info = req.get("log");
             if(info instanceof String){
                 iVmDefaultService.logs((String) info);
             }

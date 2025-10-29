@@ -28,7 +28,9 @@ import okhttp3.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -185,8 +187,8 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     }
 
     @Override
-    public Boolean pullheart(PullRequest request, HttpServletRequest http) {
-        String id = request.getBrand()+"-"+request.getMac();
+    public String pullheart(PullRequest request, HttpServletRequest http) {
+        String id = request.getBrand() + "-" + request.getMac();
         PullUser pulluser;
         pulluser = (PullUser) onlinePullList.getIfPresent(id);
         if (ObjectUtils.isEmpty(pulluser)) {
@@ -222,12 +224,15 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         } catch (Exception e) {
             //throw new RuntimeException(e);
             System.out.println("-ip analysis frequently failed,keep origin status");
-            e.printStackTrace();
-            onlinePullList.put(id, pulluser);
-            return true;
+            //e.printStackTrace();
         }
         onlinePullList.put(id, pulluser);
-        return true;
+        String group = pulluser.getPullGroups();
+        if(group != null && !group.isEmpty()){
+            VmCloudServer server =groupsInfoMapper.getVmIdByGroupId(group);
+            return "rtmp://"+server.getRemoteIp()+"/live/user_"+server.getInstanceId();
+        }
+        return "";
     }
 
     @Override
@@ -244,8 +249,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         }
 
         QueryWrapper<VmUser> vmwrapper = new QueryWrapper<VmUser>().select().eq("user_id", id);
-        List<VmUser> vmUserList = vmUserMapper.selectList(vmwrapper);
-        if (vmUserList.isEmpty()) {
+        VmUser vmUserList = vmUserMapper.selectOne(vmwrapper);
+        String vmId = vmUserList.getVmServerId();
+        if (vmUserList == null) {
             QueryWrapper<DefaultVmConfig> queryWrapper = new QueryWrapper<DefaultVmConfig>().select().eq("designator", liveGoodsMapper.selectUserId(UserContext.getToken()));
             List<DefaultVmConfig> list = vmDefaultConfigMapper.selectList(queryWrapper);
             DefaultVmConfig defaultVmConfig = null;
@@ -263,19 +269,68 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             if (vmCloudServerService.createServerForVm(req, id)) {
                 result.put("code", 200);
                 result.put("msg", "已启动");
-                LogUtils.setLog(LogContants.RUNTIME.getCode(),"服务端创建成功",id);
+                result.put("data",vmId);
+                LogUtils.setLog(LogContants.RUNTIME.getCode(), "服务端创建成功", id);
                 return result;
             } else {
                 result.put("code", 400);
                 result.put("msg", "创建失败！");
-                LogUtils.setLog(LogContants.RUNTIME.getCode(),"服务端创建失败。",id);
+                LogUtils.setLog(LogContants.RUNTIME.getCode(), "服务端创建失败。", id);
                 return result;
             }
         } else {
             result.put("code", 201);
             result.put("msg", "已存在启动服务器！服务器创建终止");
-            LogUtils.setLog(LogContants.RUNTIME.getCode(), "已存在启动服务器，持续调用。服务端创建成功。",id);
+            result.put("data",vmId);
+
+            LogUtils.setLog(LogContants.RUNTIME.getCode(), "已存在启动服务器，持续调用。服务端创建成功。", id);
             return result;
+        }
+    }
+
+    @Override
+    public Map stopVm(String vmId) {
+        Map result = new HashMap();
+        try {
+            vmCloudServerService.shutdownInstance(vmId);
+        }catch (Exception e){
+            result.put("code", 400);
+            result.put("msg", "服务器停止失败");
+            return  result;
+        }
+        result.put("code", 200);
+        result.put("msg", "服务器正在停止，请稍后查看状态");
+        return result;
+    }
+
+    @Override
+    public Map restartVm(String vmId) {
+        Map result = new HashMap();
+        try {
+            vmCloudServerService.rebootInstance(vmId);
+        }catch (Exception e){
+            result.put("code", 400);
+            result.put("msg", "服务器重启失败");
+            return  result;
+        }
+        result.put("code", 200);
+        result.put("msg", "服务器正在重启，请稍后查看状态");
+        return result;
+    }
+
+    @Override
+    public Boolean ping(String ip) {
+        try {
+            InetAddress address = InetAddress.getByName(ip);
+            boolean reachable = address.isReachable(3000);
+            if (reachable) {
+                return Boolean.TRUE;
+            } else {
+                return Boolean.FALSE;
+            }
+        } catch (Exception e) {
+            System.out.println("-ip ping failed");
+            return Boolean.FALSE;
         }
     }
 
@@ -304,9 +359,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
         QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
         UserValidtime userValidtime = validtimeMapper.selectOne(wrapper);
-        if(userValidtime == null){
+        if (userValidtime == null) {
             yunboRow.put("is_open", false);
-        }else if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
+        } else if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
             yunboRow.put("is_open", false);
         } else {
             yunboRow.put("is_open", true);
@@ -334,18 +389,18 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 if (jitem.getInteger("id") == 6194 || jitem.getInteger("id") == 6345) {
 
                     if (jitem.getInteger("id") == 6194) {
-                        if(userValidtime == null){
+                        if (userValidtime == null) {
                             yunboRow.put("is_open", false);
-                        }else if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
+                        } else if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
                         } else {
                             jitem.put("is_open", true);
                         }
                     }
                     if (jitem.getInteger("id") == 6345) {
-                        if(userValidtime == null){
+                        if (userValidtime == null) {
                             yunboRow.put("is_open", false);
-                        }else if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
+                        } else if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
                         } else {
                             jitem.put("is_open", true);
@@ -421,9 +476,9 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         for (PullUser item : pullUserList) {
             LiveUser liveUser = new LiveUser();
             liveUser.setMachineCode(item.getId());
-            GroupsInfo ginfo = groupsInfoMapper.selectOne(new QueryWrapper<GroupsInfo>().eq("id",item.getPullGroups()));
+            GroupsInfo ginfo = groupsInfoMapper.selectOne(new QueryWrapper<GroupsInfo>().eq("id", item.getPullGroups()));
             liveUser.setGroups(ginfo == null ? "-" : ginfo.getGroupName());
-            JSONObject currentUserInfo = (JSONObject) onlinePullList.getIfPresent(item.getId()) == null ?  null : (JSONObject) onlinePullList.getIfPresent(item.getId());
+            PullUser currentUserInfo = onlinePullList.getIfPresent(item.getId()) == null ? null : (PullUser) onlinePullList.getIfPresent(item.getId());
             if (currentUserInfo == null) {
                 liveUser.setIsOnline(Boolean.FALSE);
 //                liveUser.setBelong(item.getUserName());
@@ -445,8 +500,8 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
             } else {
                 liveUser.setIsOnline(Boolean.TRUE);
 //                liveUser.setBelong(item.getUserName());
-                liveUser.setSendIp(currentUserInfo.getString("remoteIp"));
-                liveUser.setSendLocation(currentUserInfo.getString("location"));
+                liveUser.setSendIp(currentUserInfo.getRemoteIp());
+                liveUser.setSendLocation(currentUserInfo.getLocation());
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getPullGroups());
                 if (vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
@@ -459,7 +514,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                     liveUser.setReceiveIp(vmCloudServer.getRemoteIp());
                     liveUser.setCreateTime(vmCloudServer.getCreateTime().toString());
                 }
-                liveUser.setSendOperator(currentUserInfo.getString("netOperator"));
+                liveUser.setSendOperator(currentUserInfo.getNetOperator());
             }
             liveUserList.add(liveUser);
         }
@@ -596,7 +651,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         result.put("code", 200);
         result.put("msg", "ok");
         result.put("data", builder.toString().toString());
-        LogUtils.setLog(LogContants.RUNTIME.getCode(),"获取推流地址...",uid);
+        LogUtils.setLog(LogContants.RUNTIME.getCode(), "获取推流地址...", uid);
         return result;
     }
 
@@ -617,7 +672,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
 
     @Override
     public Boolean logs(String loginfo) {
-        LogUtils.setLog(LogContants.RUNTIME.getCode(),loginfo,liveGoodsMapper.selectUserId(UserContext.getToken()));
+        LogUtils.setLog(LogContants.RUNTIME.getCode(), loginfo, liveGoodsMapper.selectUserId(UserContext.getToken()));
         return true;
     }
 
@@ -631,7 +686,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
     public Boolean deleteGroups(String id) {
         try {
             groupsInfoMapper.delete(new QueryWrapper<GroupsInfo>().eq("id", id));
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
 
@@ -640,15 +695,15 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
 
     @Override
     public List<UserValidtime> pusherList() {
-        List<UserValidtime> list= validtimeMapper.selectList(new QueryWrapper<UserValidtime>());
+        List<UserValidtime> list = validtimeMapper.selectList(new QueryWrapper<UserValidtime>());
         return list;
     }
 
     @Override
     public Boolean saveGroup(GroupsInfo groupsInfo) {
-        try{
+        try {
             groupsInfoMapper.insert(groupsInfo);
-        }catch (Exception e){
+        } catch (Exception e) {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;

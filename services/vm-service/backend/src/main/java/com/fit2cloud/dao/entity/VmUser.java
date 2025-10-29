@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 public class VmUser {
 
   private long id;
-  private long vmServerId;
+  private String vmServerId;
   private long userId;
 
 

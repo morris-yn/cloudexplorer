@@ -729,7 +729,7 @@ public class VmCloudServerServiceImpl extends ServiceImpl<BaseVmCloudServerMappe
 
             createServerJob(vmCloudServer.getId(), JsonUtil.toJSONString(requestObj), request, OperatedTypeEnum.CREATE_SERVER.getDescription(), this::modifyResource, jobRecordCommonService::initJobRecord, jobRecordCommonService::modifyJobRecord);
             VmUser vmUser = new VmUser();
-            vmUser.setVmServerId(Long.parseLong(vmCloudServer.getId()));
+            vmUser.setVmServerId(vmCloudServer.getId());
             vmUser.setUserId(Long.parseLong(userId));
             vmUserMapper.insert(vmUser);
         }

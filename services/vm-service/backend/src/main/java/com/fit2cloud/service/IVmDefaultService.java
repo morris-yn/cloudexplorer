@@ -32,9 +32,15 @@ public interface IVmDefaultService extends IService<DefaultVmConfig> {
 
     Boolean heart(HttpServletRequest request);
 
-    Boolean pullheart(PullRequest request,HttpServletRequest http);
+    String pullheart(PullRequest request,HttpServletRequest http);
 
     Map startVm();
+
+    Map stopVm(String vmId);
+
+    Map restartVm(String vmId);
+
+    Boolean ping(String ip);
 
     Boolean set(DefaultVmConfig request);
 
