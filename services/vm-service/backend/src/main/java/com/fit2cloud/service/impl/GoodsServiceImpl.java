@@ -9,30 +9,28 @@ import com.fit2cloud.dao.mapper.UserValidtimeMapper;
 import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
 import com.fit2cloud.service.IGoodsService;
 import com.fit2cloud.utils.LogUtils;
+import com.fit2cloud.utils.RedisUtils;
 import com.fit2cloud.utils.UserContext;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @Service
 public class GoodsServiceImpl implements IGoodsService {
 
@@ -112,6 +110,12 @@ public class GoodsServiceImpl implements IGoodsService {
             result.put("msg", "购买成功");
             return result;
         }
+        String requestId = RedisUtils.tryLock("buyLocker",10,30);
+        if(requestId == null){
+            result.put("code", 300);
+            result.put("msg", "请重试");
+            return result;
+        }
         //
 //        OkHttpClient client = new OkHttpClient();
         if ("".equals(sessionId)) {
@@ -141,6 +145,8 @@ public class GoodsServiceImpl implements IGoodsService {
             }
         }
 
+        cleanCart();
+
         //加入购物车
 
         RequestBody formBody = new MultipartBody.Builder()
@@ -156,8 +162,8 @@ public class GoodsServiceImpl implements IGoodsService {
         Response response = null;
         try {
             response = client.newCall(request).execute();
-            String resStr = response.body().string();
-            System.out.println(resStr);
+            //String resStr = response.body().string();
+            //System.out.println(resStr);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -193,7 +199,7 @@ public class GoodsServiceImpl implements IGoodsService {
         // 发送请求并打印响应
         try (Response responseDone = client.newCall(request).execute()) {
             String text = responseDone.body().string();
-            System.out.println(text);
+            //System.out.println(text);
             Pattern orderPattern = Pattern.compile("订单号.*?<font[^>]*>(\\d+)</font>", Pattern.DOTALL);
             Matcher orderMatcher = orderPattern.matcher(text);
             if (orderMatcher.find()) {
@@ -224,7 +230,44 @@ public class GoodsServiceImpl implements IGoodsService {
         result.put("payLogId", payLogId);
         result.put("retired", 5);
         LogUtils.setLog(LogContants.ORDER.getCode(), JSONObject.toJSONString(result),userid);
+        RedisUtils.unlock("buyLocker",requestId);
         return result;
+    }
+
+    private void cleanCart() {
+        Request request = new Request.Builder()
+                .url("https://shop.livepartner.fans/index.php")
+                .addHeader("Cookie", sessionId)
+                .build();
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+            String resStr = response.body().string();
+            Pattern pattern = Pattern.compile("deleteCartGoods\\((\\d+)\\)");
+            Matcher matcher = pattern.matcher(resStr);
+            while (matcher.find()) {
+                String cartGoodsId = matcher.group(1).trim();
+                RequestBody formBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("id", cartGoodsId)
+                        .build();
+
+                request = new Request.Builder()
+                        .url("https://shop.livepartner.fans/delete_cart_goods.php")
+                        .post(formBody)
+                        .addHeader("Cookie", sessionId + "; ECS[visit_times]=1")
+                        .addHeader("User-Agent", "Apifox/1.0.0 (https://apifox.com)")
+                        .addHeader("Accept", "*/*")
+                        .addHeader("Host", "shop.livepartner.fans")
+                        .addHeader("Connection", "keep-alive")
+                        .build();
+                client.newCall(request).execute();
+                log.info("------------清除购物车：{}", cartGoodsId);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
