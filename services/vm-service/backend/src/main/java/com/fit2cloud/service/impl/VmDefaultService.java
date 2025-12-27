@@ -503,7 +503,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 liveUser.setSendIp(currentUserInfo.getRemoteIp());
                 liveUser.setSendLocation(currentUserInfo.getLocation());
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getPullGroups());
-                if (vmCloudServer.getInstanceName() == null) {
+                if (vmCloudServer == null || vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
                     liveUser.setReceiveStatus("-");
                     liveUser.setReceiveIp("-");
