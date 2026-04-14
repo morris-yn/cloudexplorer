@@ -242,9 +242,15 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
         QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
         UserValidtime userValidtime = validtimeMapper.selectOne(wrapper);
-        if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
+        if (userValidtime == null || userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
             result.put("code", 400);
             result.put("msg", "剩余时间不足！");
+            return result;
+        }
+
+        if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
+            result.put("code", 405);
+            result.put("msg", "未绑定拉流用户");
             return result;
         }
 
@@ -359,7 +365,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
         String id = liveGoodsMapper.selectUserId(UserContext.getToken());
         QueryWrapper<UserValidtime> wrapper = new QueryWrapper<UserValidtime>().select().eq("user_id", id);
         UserValidtime userValidtime = validtimeMapper.selectOne(wrapper);
-        if (userValidtime == null) {
+        if (userValidtime == null || userValidtime.getVaildTime() == null) {
             yunboRow.put("is_open", false);
         } else if (userValidtime.getVaildTime().isBefore(LocalDateTime.now())) {
             yunboRow.put("is_open", false);
@@ -389,7 +395,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 if (jitem.getInteger("id") == 6194 || jitem.getInteger("id") == 6345) {
 
                     if (jitem.getInteger("id") == 6194) {
-                        if (userValidtime == null) {
+                        if (userValidtime == null || userValidtime.getVaildTime() == null) {
                             yunboRow.put("is_open", false);
                         } else if (userValidtime.getServerAVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
@@ -398,7 +404,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                         }
                     }
                     if (jitem.getInteger("id") == 6345) {
-                        if (userValidtime == null) {
+                        if (userValidtime == null || userValidtime.getVaildTime() == null) {
                             yunboRow.put("is_open", false);
                         } else if (userValidtime.getServerBVt().isBefore(LocalDateTime.now())) {
                             jitem.put("is_open", false);
