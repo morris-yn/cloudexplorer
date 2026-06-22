@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.dao.entity.contant.LogContants;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
+import com.fit2cloud.dao.mapper.UserAreaMapper;
 import com.fit2cloud.dao.mapper.UserValidtimeMapper;
 import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
 import com.fit2cloud.service.IGoodsService;
@@ -42,6 +43,9 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Resource
     UserValidtimeMapper userValidtimeMapper;
+
+    @Resource
+    UserAreaMapper userAreaMapper;
 
     private static OkHttpClient client = new OkHttpClient();
 
@@ -364,6 +368,60 @@ public class GoodsServiceImpl implements IGoodsService {
         return result;
     }
 
+    @Override
+    public List<YunboArea> getAreaList(String type) {
+        OkHttpClient client = new OkHttpClient();
+        RequestBody req = new FormBody.Builder()
+                .add("act", "test")
+                .add("return_data", "json")
+                .build();
+
+
+        Response okResponse = null;
+        String resStr = "";
+        Request okRequest = null;
+
+        switch (type) {
+            //1为国内  2为国外
+            case "1":
+                okRequest = new Request.Builder()
+                        .url("http://ecshop-api.livepartner.fans//?service=Category.categorylistGoodsListApi&cat_id=83&pageSize=50")
+                        .header("Weibo-Token", UserContext.getToken())
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .post(req)
+                        .build();
+                break;
+            case "2":
+                okRequest = new Request.Builder()
+                        .url("http://ecshop-api.livepartner.fans//?service=Category.categorylistGoodsListApi&cat_id=84&pageSize=50")
+                        .header("Weibo-Token", UserContext.getToken())
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .post(req)
+                        .build();
+                break;
+            default:
+                return List.of();
+        }
+        List<YunboArea> results = new ArrayList<>();
+        try {
+            okResponse = client.newCall(okRequest).execute();
+            resStr = okResponse.body().string();
+            JSONObject resJo = JSONObject.parseObject(resStr);
+            for(Object item: resJo.getJSONObject("data").getJSONArray("rows")){
+                JSONObject itemJo = (JSONObject)item;
+                YunboArea area = new YunboArea();
+                area.setId(itemJo.getLong("id"));
+                area.setArea(itemJo.getString("goods_name"));
+                results.add(area);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return results;
+    }
+
     public static String generateQRCode(String content, int width, int height, String filePath) throws Exception {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
@@ -383,6 +441,37 @@ public class GoodsServiceImpl implements IGoodsService {
         byte[] bytes = outputStream.toByteArray();
 
         return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    @Override
+    public Boolean saveUserArea(List<Long> areaIds, String type) {
+        String userId = liveGoodsMapper.selectUserId(UserContext.getToken());
+        
+        userAreaMapper.deleteByUserId(userId);
+        
+        List<YunboArea> areaList = getAreaList(type);
+        
+        for (Long areaId : areaIds) {
+            UserArea userArea = new UserArea();
+            userArea.setUserId(userId);
+            userArea.setAreaId(areaId);
+            
+            String areaName = areaList.stream()
+                    .filter(a -> a.getId() == areaId)
+                    .map(YunboArea::getArea)
+                    .findFirst()
+                    .orElse("");
+            userArea.setAreaName(areaName);
+            userArea.setAreaType(Integer.parseInt(type));
+            userAreaMapper.insert(userArea);
+        }
+        return true;
+    }
+
+    @Override
+    public List<UserArea> getUserArea() {
+        String userId = liveGoodsMapper.selectUserId(UserContext.getToken());
+        return userAreaMapper.selectByUserId(userId);
     }
 
 }

@@ -1,9 +1,6 @@
 package com.fit2cloud.service;
 
-import com.fit2cloud.dao.entity.CDcard;
-import com.fit2cloud.dao.entity.ConfrimPayment;
-import com.fit2cloud.dao.entity.GoodsToCart;
-import com.fit2cloud.dao.entity.LiveGoods;
+import com.fit2cloud.dao.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -29,4 +26,10 @@ public interface IGoodsService {
     Long getVaildTimeByToken(String token);
 
     Map<String,String> writeoff(CDcard card);
+
+    List<YunboArea> getAreaList(String type);
+
+    Boolean saveUserArea(List<Long> areaIds, String type);
+
+    List<com.fit2cloud.dao.entity.UserArea> getUserArea();
 }

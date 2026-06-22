@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +43,38 @@ public class GoodsController {
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<List<LiveGoods>> list(@RequestBody LiveGoods goods) {
         return ResultHolder.success(goodsService.getList(goods));
+    }
+
+    @Operation(summary = "", description = "获取地区列表")
+    @PostMapping("/areaList")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<List<YunboArea>> areaList(@RequestBody Map<String,String> params) {
+        String type = params.get("type");
+        if(StringUtils.hasText(type)){
+            return ResultHolder.success(goodsService.getAreaList(type));
+        }else {
+            return ResultHolder.error("未找到参数type");
+        }
+    }
+
+    @Operation(summary = "", description = "保存用户选择的地区")
+    @PostMapping("/saveArea")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> saveArea(@RequestBody Map<String,Object> params) {
+        List<Long> areaIds = (List<Long>) params.get("areaIds");
+        String type = (String) params.get("type");
+        if(areaIds != null && !areaIds.isEmpty() && StringUtils.hasText(type)){
+            return ResultHolder.of(200,"保存成功",goodsService.saveUserArea(areaIds, type));
+        }else {
+            return ResultHolder.error("参数错误");
+        }
+    }
+
+    @Operation(summary = "", description = "获取用户已选择的地区")
+    @GetMapping("/getUserArea")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<Object> getUserArea() {
+        return ResultHolder.success(goodsService.getUserArea());
     }
 
     @Operation(summary = "", description = "获取支付二维码")
