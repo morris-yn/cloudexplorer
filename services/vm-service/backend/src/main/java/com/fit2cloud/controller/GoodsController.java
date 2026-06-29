@@ -61,9 +61,10 @@ public class GoodsController {
     @PostMapping("/saveArea")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
     public ResultHolder<Object> saveArea(@RequestBody Map<String,Object> params) {
-        List<Long> areaIds = (List<Long>) params.get("areaIds");
+        List<Number> areaIdNumbers = (List<Number>) params.get("areaIds");
         String type = (String) params.get("type");
-        if(areaIds != null && !areaIds.isEmpty() && StringUtils.hasText(type)){
+        if(areaIdNumbers != null && !areaIdNumbers.isEmpty() && StringUtils.hasText(type)){
+            List<Long> areaIds = areaIdNumbers.stream().map(Number::longValue).toList();
             return ResultHolder.of(200,"保存成功",goodsService.saveUserArea(areaIds, type));
         }else {
             return ResultHolder.error("参数错误");

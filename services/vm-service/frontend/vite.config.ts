@@ -12,14 +12,14 @@ const envDir = "./env";
 export default defineConfig(({ mode }) => {
   const ENV = loadEnv(mode, envDir);
   const proxyConf: Record<string, string | ProxyOptions> = {};
-  proxyConf[ENV.VITE_BASE_PATH + "api"] =
-    "http://218.60.108.63:" + Number(ENV.VITE_BASE_API_PORT);
-  proxyConf[ENV.VITE_BASE_PATH + "login"] =
-    "http://218.60.108.63:" + Number(ENV.VITE_BASE_API_PORT);
-    // proxyConf[ENV.VITE_BASE_PATH + "api"] =
-    //     "http://127.0.0.1:" + Number(ENV.VITE_BASE_API_PORT);
-    // proxyConf[ENV.VITE_BASE_PATH + "login"] =
-    //     "http://127.0.0.1:" + Number(ENV.VITE_BASE_API_PORT);
+  // proxyConf[ENV.VITE_BASE_PATH + "api"] =
+  //   "http://159.75.158.61:" + Number(ENV.VITE_BASE_API_PORT);
+  // proxyConf[ENV.VITE_BASE_PATH + "login"] =
+  //   "http://159.75.158.61:" + Number(ENV.VITE_BASE_API_PORT);
+    proxyConf[ENV.VITE_BASE_PATH + "api"] =
+        "http://127.0.0.1:" + Number(ENV.VITE_BASE_API_PORT);
+    proxyConf[ENV.VITE_BASE_PATH + "login"] =
+        "http://127.0.0.1:" + Number(ENV.VITE_BASE_API_PORT);
   return {
     define: {
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false)
