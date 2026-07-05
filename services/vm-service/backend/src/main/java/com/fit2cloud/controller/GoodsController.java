@@ -57,6 +57,18 @@ public class GoodsController {
         }
     }
 
+    @Operation(summary = "", description = "（获取地区列表后）获取价格列表")
+    @PostMapping("/priceList")
+//    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")
+    public ResultHolder<List<PriceItem>> priceList(@RequestBody Map<String,String> params) {
+        String areaId = params.get("areaId");
+        if(StringUtils.hasText(areaId)){
+            return ResultHolder.success(goodsService.getPriceList(areaId));
+        }else {
+            return ResultHolder.error("未找到参数type");
+        }
+    }
+
     @Operation(summary = "", description = "保存用户选择的地区")
     @PostMapping("/saveArea")
 //    @PreAuthorize("@cepc.hasAnyCePermission('CLOUD_SERVER:READ')")

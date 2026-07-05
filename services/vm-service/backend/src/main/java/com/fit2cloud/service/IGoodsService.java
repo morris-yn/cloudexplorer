@@ -29,6 +29,8 @@ public interface IGoodsService {
 
     List<YunboArea> getAreaList(String type);
 
+    List<PriceItem> getPriceList(String areaId);
+
     Boolean saveUserArea(List<Long> areaIds, String type);
 
     List<com.fit2cloud.dao.entity.UserArea> getUserArea();

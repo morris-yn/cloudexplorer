@@ -422,6 +422,46 @@ public class GoodsServiceImpl implements IGoodsService {
         return results;
     }
 
+    @Override
+    public List<PriceItem> getPriceList(String areaId) {
+        OkHttpClient client = new OkHttpClient();
+        RequestBody req = new FormBody.Builder()
+                .add("act", "test")
+                .add("return_data", "json")
+                .build();
+
+
+        Response okResponse = null;
+        String resStr = "";
+        Request okRequest = null;
+
+        okRequest = new Request.Builder()
+                .url("http://ecshop-api.livepartner.fans//?service=Goods.detail&goods_id="+areaId)
+                .header("Weibo-Token", UserContext.getToken())
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(req)
+                .build();
+        List<PriceItem> results = new ArrayList<>();
+        try {
+            okResponse = client.newCall(okRequest).execute();
+            resStr = okResponse.body().string();
+            JSONObject resJo = JSONObject.parseObject(resStr);
+            for(Object item: resJo.getJSONObject("data").getJSONArray("attrlist")){
+                JSONObject itemJo = (JSONObject)item;
+                PriceItem priceItem = new PriceItem();
+                priceItem.setId(itemJo.getLong("id"));
+                priceItem.setName(itemJo.getString("name"));
+                priceItem.setPrice(itemJo.getDouble("value"));
+                results.add(priceItem);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        return results;
+    }
+
     public static String generateQRCode(String content, int width, int height, String filePath) throws Exception {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         Hashtable<EncodeHintType, Object> hints = new Hashtable<>();
