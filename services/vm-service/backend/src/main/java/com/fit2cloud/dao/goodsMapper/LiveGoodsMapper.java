@@ -15,7 +15,7 @@ public interface LiveGoodsMapper extends BaseMapper<LiveGoods> {
             "         left join live_pay_log log on info.order_id = log.order_id\n" +
             "         left join live_order_goods lorder on lorder.order_id = info.order_id\n" +
             "         left join live_goods goods on goods.goods_id = lorder.goods_id\n" +
-            "where info.order_sn = #{orderSn}")
+            "where info.order_sn = #{orderSn} limit 1")
     public PayStatus selectPayStatus(@Param("orderSn") String orderSn);
 
     @Select("select userid from live_sessions where sessKey = #{sessionkey}")

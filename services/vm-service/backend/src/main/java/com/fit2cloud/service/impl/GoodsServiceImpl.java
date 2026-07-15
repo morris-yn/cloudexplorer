@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fit2cloud.dao.entity.*;
 import com.fit2cloud.dao.entity.contant.LogContants;
 import com.fit2cloud.dao.goodsMapper.LiveGoodsMapper;
+import com.fit2cloud.dao.mapper.OrderRecordMapper;
 import com.fit2cloud.dao.mapper.UserAreaMapper;
 import com.fit2cloud.dao.mapper.UserValidtimeMapper;
 import com.fit2cloud.dao.mapper.VmDefaultConfigMapper;
@@ -46,6 +47,9 @@ public class GoodsServiceImpl implements IGoodsService {
 
     @Resource
     UserAreaMapper userAreaMapper;
+
+    @Resource
+    OrderRecordMapper orderRecordMapper;
 
     private static OkHttpClient client = new OkHttpClient();
 
@@ -203,7 +207,7 @@ public class GoodsServiceImpl implements IGoodsService {
         // 发送请求并打印响应
         try (Response responseDone = client.newCall(request).execute()) {
             String text = responseDone.body().string();
-            //System.out.println(text);
+            System.out.println(text);
             Pattern orderPattern = Pattern.compile("订单号.*?<font[^>]*>(\\d+)</font>", Pattern.DOTALL);
             Matcher orderMatcher = orderPattern.matcher(text);
             if (orderMatcher.find()) {
@@ -228,6 +232,19 @@ public class GoodsServiceImpl implements IGoodsService {
         } catch (Exception e) {
             throw e;
         }
+
+        // 保存订单记录
+        LiveGoods liveGoods = liveGoodsMapper.selectById(goods.getGoodsId());
+        OrderRecord orderRecord = new OrderRecord();
+        orderRecord.setOrderId(orderId);
+        orderRecord.setGoodsId(Long.parseLong(goods.getGoodsId().toString()));
+        orderRecord.setUserId(userid);
+        orderRecord.setDuration(liveGoods != null ? liveGoods.getGoodsBrief() : null);
+        orderRecord.setQrcode(qrcode);
+        orderRecord.setPayLogId(liveGoodsMapper.getPayLogId(orderId));
+        orderRecord.setVerified(false);
+        orderRecordMapper.insert(orderRecord);
+
         result.put("QRcode", qrcode);
         result.put("orderId", orderId);
         String payLogId = liveGoodsMapper.getPayLogId(orderId);
@@ -300,16 +317,47 @@ public class GoodsServiceImpl implements IGoodsService {
         }
 
         String userid = liveGoodsMapper.selectUserId(UserContext.getToken());
-        UserValidtime userValidtime = vmDefaultConfigMapper.selectUserValidtime(userid);
-        if (userValidtime.getVaildTime().isAfter(LocalDateTime.now())) {
-            LocalDateTime time = userValidtime.getVaildTime().plusHours(Integer.parseInt(payStatus.getGoodsBrief()));
-            userValidtime.setVaildTime(time);
-            userValidtimeMapper.updateById(userValidtime);
-        } else {
-            LocalDateTime time = LocalDateTime.now().plusHours(Integer.parseInt(payStatus.getGoodsBrief()));
-            userValidtime.setVaildTime(time);
-            userValidtimeMapper.updateById(userValidtime);
+
+        // 查询当前订单记录
+        QueryWrapper<OrderRecord> orderWrapper = new QueryWrapper<>();
+        orderWrapper.eq("order_id", confrimPayment.getOrderId())
+                   .eq("user_id", userid);
+        OrderRecord orderRecord = orderRecordMapper.selectOne(orderWrapper);
+
+        if (orderRecord != null && !orderRecord.getVerified()) {
+            UserValidtime userValidtime = vmDefaultConfigMapper.selectUserValidtime(userid);
+
+            if (payStatus.getGoodsBrief() != null && !payStatus.getGoodsBrief().isEmpty()) {
+                try {
+                    int hours = Integer.parseInt(payStatus.getGoodsBrief());
+
+                    // 获取当前有效时间，如果为null则从当前时间开始
+                    LocalDateTime currentValidTime = (userValidtime != null && userValidtime.getVaildTime() != null)
+                        ? userValidtime.getVaildTime()
+                        : LocalDateTime.now();
+
+                    if (currentValidTime.isAfter(LocalDateTime.now())) {
+                        LocalDateTime time = currentValidTime.plusHours(hours);
+                        userValidtime.setVaildTime(time);
+                    } else {
+                        LocalDateTime time = LocalDateTime.now().plusHours(hours);
+                        userValidtime.setVaildTime(time);
+                    }
+
+                    // 更新用户有效时间
+                    if (userValidtime != null) {
+                        userValidtimeMapper.updateById(userValidtime);
+                    }
+
+                    // 标记订单为已核销
+                    orderRecord.setVerified(true);
+                    orderRecordMapper.updateById(orderRecord);
+                } catch (NumberFormatException e) {
+                    log.error("无法解析时长: {}", payStatus.getGoodsBrief(), e);
+                }
+            }
         }
+
         return true;
     }
 
@@ -407,11 +455,11 @@ public class GoodsServiceImpl implements IGoodsService {
             okResponse = client.newCall(okRequest).execute();
             resStr = okResponse.body().string();
             JSONObject resJo = JSONObject.parseObject(resStr);
-            for(Object item: resJo.getJSONObject("data").getJSONArray("rows")){
+            for(Object item: resJo.getJSONObject("data").getJSONArray("subcategories")){
                 JSONObject itemJo = (JSONObject)item;
                 YunboArea area = new YunboArea();
-                area.setId(itemJo.getLong("id"));
-                area.setArea(itemJo.getString("goods_name"));
+                area.setId(itemJo.getLong("cat_id"));
+                area.setArea(itemJo.getString("cat_name"));
                 results.add(area);
             }
         } catch (IOException e) {
@@ -436,7 +484,7 @@ public class GoodsServiceImpl implements IGoodsService {
         Request okRequest = null;
 
         okRequest = new Request.Builder()
-                .url("http://ecshop-api.livepartner.fans//?service=Goods.detail&goods_id="+areaId)
+                .url("http://ecshop-api.livepartner.fans//?service=Category.categorylistGoodsListApi&cat_id="+areaId+"&pageSize=50")
                 .header("Weibo-Token", UserContext.getToken())
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .post(req)
@@ -446,12 +494,12 @@ public class GoodsServiceImpl implements IGoodsService {
             okResponse = client.newCall(okRequest).execute();
             resStr = okResponse.body().string();
             JSONObject resJo = JSONObject.parseObject(resStr);
-            for(Object item: resJo.getJSONObject("data").getJSONArray("attrlist")){
+            for(Object item: resJo.getJSONObject("data").getJSONArray("rows")){
                 JSONObject itemJo = (JSONObject)item;
                 PriceItem priceItem = new PriceItem();
                 priceItem.setId(itemJo.getLong("id"));
-                priceItem.setName(itemJo.getString("name"));
-                priceItem.setPrice(itemJo.getDouble("value"));
+                priceItem.setName(itemJo.getString("goods_name"));
+                priceItem.setPrice(itemJo.getDouble("shop_price"));
                 results.add(priceItem);
             }
         } catch (IOException e) {

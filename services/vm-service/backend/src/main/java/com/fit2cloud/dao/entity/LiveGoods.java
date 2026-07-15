@@ -1,5 +1,6 @@
 package com.fit2cloud.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 @TableName("live_goods")
 public class LiveGoods {
 
+  @TableId("goods_id")
   private long goodsId;
   private long catId;
   private String goodsSn;
