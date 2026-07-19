@@ -454,7 +454,7 @@ public class VmDefaultService extends ServiceImpl<VmDefaultConfigMapper, Default
                 liveUser.setSendIp(currentUserInfo.getString("remoteIp"));
                 liveUser.setSendLocation(currentUserInfo.getString("location"));
                 VmCloudServer vmCloudServer = validtimeMapper.selectVmCloudServerByUserId(item.getUserId());
-                if (vmCloudServer.getInstanceName() == null) {
+                if (vmCloudServer == null || vmCloudServer.getInstanceName() == null) {
                     liveUser.setReceiveServer("-");
                     liveUser.setReceiveStatus("-");
                     liveUser.setReceiveIp("-");
